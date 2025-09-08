@@ -1,0 +1,28 @@
+services:
+  frontend:
+    ports:
+      - "3000:3000"
+    build:
+      context: ./frontend
+      dockerfile: dockerfile.dev
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NODE_ENV=development
+    networks:
+      - dev-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge
