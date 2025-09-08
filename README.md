@@ -16,5 +16,5 @@
 ---
 
 ## デモ　/ プレゼン資料
-- デモURL: [https://hackathon.french-fly.me]
-- プレゼンURL： [https://example.com]
+- デモURL: [デモサイト](https://hackathon.french-fly.me)
+- プレゼンURL: [プレゼン資料](https://your-presentation-url.com) <!-- TODO: Replace with actual presentation URL -->
