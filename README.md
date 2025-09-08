@@ -5,13 +5,16 @@
 ---
 
 ## チーム情報
-- チーム番号: （ここに記入）
-- チーム名: （ここに記入）
-- プロダクト名: （ここに記入）
-- メンバー: （GitHubアカウントまたは名前を列挙）
+- チーム番号: 28番
+- チーム名:  信州(仮)
+- プロダクト名:  投票(仮)
+- メンバー: 
+            rainfallseason
+            IsseiKitta
+            yzk0707
 
 ---
 
 ## デモ　/ プレゼン資料
-- デモURL: 
-- プレゼンURL：
+- デモURL: [デモサイト](https://hackathon.french-fly.me)
+- プレゼンURL: [プレゼン資料](https://your-presentation-url.com) <!-- TODO: Replace with actual presentation URL -->
