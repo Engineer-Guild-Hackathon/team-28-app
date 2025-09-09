@@ -10,18 +10,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-
-// カテゴリーのリスト
-const categories = [
-  "すべて",
-  "一般",
-  "食べ物",
-  "ライフスタイル",
-  "テクノロジー",
-  "エンタメ",
-  "スポーツ",
-  "政治",
-];
+import { categories } from "@/constants/categories";
 
 export default function Header() {
   return (
