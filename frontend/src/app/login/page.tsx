@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import Header from "@/components/common/Header";
+import Header from "@/components/common/header";
 
 export default function Page() {
   const [username, setUsername] = useState("");

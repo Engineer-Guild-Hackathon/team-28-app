@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import Header from "@/components/common/header";
 
 // ダミーデータ：投票項目
-const popularPolls = [
+const dummyPolls = [
   {
     id: 1,
     title: "好きな季節は？",
@@ -88,14 +89,39 @@ const categories = [
   "政治",
 ];
 
-export default function HomePage() {
+export default function SearchPage() {
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("すべて");
+  const [sortOption, setSortOption] = useState("人気順");
 
-  // カテゴリーでフィルタリングした投票を取得
-  const filteredPolls =
-    selectedCategory === "すべて"
-      ? popularPolls
-      : popularPolls.filter((poll) => poll.category === selectedCategory);
+  // 検索結果のフィルタリング
+  const filteredPolls = dummyPolls
+    .filter((poll) => {
+      // カテゴリーフィルター
+      if (selectedCategory !== "すべて" && poll.category !== selectedCategory) {
+        return false;
+      }
+
+      // 検索語フィルター
+      if (
+        searchTerm &&
+        !poll.title.toLowerCase().includes(searchTerm.toLowerCase())
+      ) {
+        return false;
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      // 並び替え
+      if (sortOption === "人気順") {
+        return b.votes - a.votes;
+      } else if (sortOption === "新着順") {
+        // ここでは投票数をダミーの新着順として使用
+        return b.id - a.id;
+      }
+      return 0;
+    });
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -104,121 +130,160 @@ export default function HomePage() {
 
       {/* メインコンテンツ */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* ヒーローセクション */}
-        <section className="bg-blue-600 rounded-xl text-white p-8 mb-12">
-          <div className="max-w-3xl">
-            <h2 className="text-3xl font-bold mb-4">みんなの意見を集めよう</h2>
-            <p className="text-xl mb-6">
-              簡単に投票を作成して、友達や同僚と共有できます。意思決定をもっとシンプルに。
+        {/* 検索ヘッダー */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">投票を検索</h1>
+          <div className="flex flex-col md:flex-row gap-4 items-end">
+            <div className="flex-1">
+              <label
+                htmlFor="search"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                キーワード
+              </label>
+              <Input
+                id="search"
+                type="text"
+                placeholder="検索キーワードを入力"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div className="w-full md:w-48">
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                カテゴリー
+              </label>
+              <select
+                id="category"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              >
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-full md:w-48">
+              <label
+                htmlFor="sort"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                並び替え
+              </label>
+              <select
+                id="sort"
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="人気順">人気順</option>
+                <option value="新着順">新着順</option>
+              </select>
+            </div>
+            <Button className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
+              検索
+            </Button>
+          </div>
+        </div>
+
+        {/* 検索結果カウント */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-gray-900">
+            検索結果: {filteredPolls.length}件
+          </h2>
+        </div>
+
+        {/* 検索結果 */}
+        {filteredPolls.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPolls.map((poll) => (
+              <div
+                key={poll.id}
+                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+              >
+                <div className="p-6">
+                  <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
+                    {poll.title}
+                  </h4>
+                  <div className="flex items-center text-sm text-gray-600 mb-4">
+                    <span className="mr-4">
+                      <span className="font-medium text-blue-600">
+                        {poll.votes}
+                      </span>{" "}
+                      票
+                    </span>
+                    <span className="flex items-center">
+                      <span className="bg-gray-200 px-2 py-1 rounded-full text-xs">
+                        {poll.category}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="space-y-2 mb-6">
+                    {poll.options.slice(0, 3).map((option, index) => (
+                      <div key={index} className="flex items-center">
+                        <div
+                          className={`w-1 h-4 rounded-full mr-2 ${
+                            ["bg-blue-500", "bg-green-500", "bg-purple-500"][
+                              index % 3
+                            ]
+                          }`}
+                        />
+                        <span className="text-sm text-gray-700 line-clamp-1">
+                          {option}
+                        </span>
+                      </div>
+                    ))}
+                    {poll.options.length > 3 && (
+                      <div className="text-xs text-gray-500 ml-3">
+                        + {poll.options.length - 3} 選択肢
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <Avatar className="h-6 w-6">
+                        <img
+                          src={poll.creator.avatar}
+                          alt={poll.creator.name}
+                        />
+                      </Avatar>
+                      <span className="ml-2 text-xs text-gray-500">
+                        {poll.creator.name}
+                      </span>
+                    </div>
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="outline"
+                      className="text-xs"
+                    >
+                      <Link href={`/polls/${poll.id}`}>投票する</Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+            <p className="text-gray-500 text-lg">
+              検索条件に一致する投票が見つかりませんでした。
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="bg-white text-blue-600 hover:bg-gray-100"
-            >
+            <p className="text-gray-500 mt-2">
+              検索条件を変更するか、新しい投票を作成してみましょう。
+            </p>
+            <Button asChild className="mt-6 bg-blue-600 hover:bg-blue-700">
               <Link href="/create">投票を作成する</Link>
             </Button>
           </div>
-        </section>
-
-        {/* カテゴリータブ */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
-          <div className="flex space-x-2 overflow-x-auto pb-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                  selectedCategory === category
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* 人気の投票一覧 */}
-        <h3 className="text-xl font-bold text-gray-900 mb-6">人気の投票</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPolls.map((poll) => (
-            <div
-              key={poll.id}
-              className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-            >
-              <div className="p-6">
-                <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
-                  {poll.title}
-                </h4>
-                <div className="flex items-center text-sm text-gray-600 mb-4">
-                  <span className="mr-4">
-                    <span className="font-medium text-blue-600">
-                      {poll.votes}
-                    </span>{" "}
-                    票
-                  </span>
-                  <span className="flex items-center">
-                    <span className="bg-gray-200 px-2 py-1 rounded-full text-xs">
-                      {poll.category}
-                    </span>
-                  </span>
-                </div>
-                <div className="space-y-2 mb-6">
-                  {poll.options.slice(0, 3).map((option, index) => (
-                    <div key={index} className="flex items-center">
-                      <div
-                        className={`w-1 h-4 rounded-full mr-2 ${
-                          ["bg-blue-500", "bg-green-500", "bg-purple-500"][
-                            index % 3
-                          ]
-                        }`}
-                      />
-                      <span className="text-sm text-gray-700 line-clamp-1">
-                        {option}
-                      </span>
-                    </div>
-                  ))}
-                  {poll.options.length > 3 && (
-                    <div className="text-xs text-gray-500 ml-3">
-                      + {poll.options.length - 3} 選択肢
-                    </div>
-                  )}
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <Avatar className="h-6 w-6">
-                      <img src={poll.creator.avatar} alt={poll.creator.name} />
-                    </Avatar>
-                    <span className="ml-2 text-xs text-gray-500">
-                      {poll.creator.name}
-                    </span>
-                  </div>
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="outline"
-                    className="text-xs"
-                  >
-                    <Link href={`/polls/${poll.id}`}>投票する</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* もっと見るボタン */}
-        <div className="mt-12 text-center">
-          <Button
-            variant="outline"
-            size="lg"
-            className="border-blue-600 text-blue-600 hover:bg-blue-50"
-          >
-            もっと見る
-          </Button>
-        </div>
+        )}
       </main>
 
       {/* フッター */}
