@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Header } from "@/components/common/Header";
+import Header from "@/components/common/Header";
 
 export default function Page() {
   const [username, setUsername] = useState("");
@@ -41,19 +41,35 @@ export default function Page() {
     }
   };
 
+  // カテゴリーはHeaderコンポーネント内で定義
+
   // TODO: ログイン成功時、失敗時にページにメッセージを表示
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      {/* ヘッダー */}
-      <Header></Header>
+      {/* 共通ヘッダーコンポーネント */}
+      <Header />
 
       {/* メインコンテンツ */}
       <main className="flex flex-grow items-start justify-center px-40 py-5">
         <div className="w-full max-w-[960px] py-5 flex flex-col items-center">
           <div className="w-full text-center py-7 mb-8">
-            <h2 className="text-4xl font-bold text-gray-900">Welcome back</h2>
+            <h2 className="text-4xl font-bold text-gray-900">
+              おかえりなさい！
+            </h2>
           </div>
+
+          {message && (
+            <div
+              className={`mb-4 p-3 rounded-md ${
+                message.includes("Error")
+                  ? "bg-red-100 text-red-700"
+                  : "bg-green-100 text-green-700"
+              }`}
+            >
+              {message}
+            </div>
+          )}
 
           <form
             onSubmit={handleSubmit}
@@ -62,7 +78,7 @@ export default function Page() {
             <div className="px-4 py-2">
               <Input
                 type="text"
-                placeholder="Username"
+                placeholder="ユーザーネーム"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="h-14 rounded-lg"
@@ -71,7 +87,7 @@ export default function Page() {
             <div className="px-4 py-2">
               <Input
                 type="password"
-                placeholder="Password"
+                placeholder="パスワード"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="h-14 rounded-lg"
@@ -83,7 +99,7 @@ export default function Page() {
                 href="/forgot-password"
                 className="text-sm text-gray-500 hover:underline"
               >
-                Forgot password?
+                パスワードを忘れましたか？
               </Link>
             </div>
 
@@ -92,15 +108,15 @@ export default function Page() {
                 type="submit"
                 className="w-full bg-blue-600 hover:bg-blue-700 h-10 rounded-lg"
               >
-                Log in
+                ログイン
               </Button>
             </div>
 
             <div className="w-full text-center px-4 pt-1 pb-3">
               <p className="text-sm text-gray-500">
-                Don&apos;t have an account?{" "}
+                アカウントをもっていませんか？{" "}
                 <Link href="/signup" className="text-blue-600 hover:underline">
-                  Sign up
+                  サインアップ
                 </Link>
               </p>
             </div>
