@@ -1,69 +1,120 @@
-import { Button } from "../ui/button";
+"use client";
 
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
-export function Header() {
+// カテゴリーのリスト
+const categories = [
+  "すべて",
+  "一般",
+  "食べ物",
+  "ライフスタイル",
+  "テクノロジー",
+  "エンタメ",
+  "スポーツ",
+  "政治",
+];
+
+export default function Header() {
   return (
-    <header className="border-b border-gray-200">
-      <div className="flex justify-between items-center px-10 py-5">
-        <div className="flex items-center gap-4">
-          <div className="w-4 h-4">
-            {/* ロゴアイコン部分 */}
-            <div className="w-4 h-4 relative">
+    <header className="bg-white shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
               <svg
-                viewBox="0 0 16 16"
-                fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-full h-full"
+                className="h-5 w-5 text-white"
+                viewBox="0 0 20 20"
+                fill="currentColor"
               >
                 <path
-                  d="M8 1L1 5L8 9L15 5L8 1Z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M1 11L8 15L15 11"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M1 8L8 12L15 8"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
                 />
               </svg>
             </div>
+            <h1 className="text-xl font-bold text-gray-900">DecideBox</h1>
           </div>
-          <h1 className="font-bold text-lg text-gray-900">DecideBox</h1>
-        </div>
 
-        <div className="flex justify-end gap-8 grow">
-          <nav className="flex items-center gap-9">
-            <Link href="/" className="text-sm font-medium text-gray-900">
-              Home
-            </Link>
-            <Link href="/explore" className="text-sm font-medium text-gray-900">
-              Explore
-            </Link>
-            <Link href="/create" className="text-sm font-medium text-gray-900">
-              Create
-            </Link>
-          </nav>
+          <div className="flex-1 mx-8">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className="px-4 py-2 hover:text-blue-600"
+                  >
+                    <Link href="/">ホーム</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className="px-4 py-2 hover:text-blue-600"
+                  >
+                    <Link href="/explore">探す</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="px-4 py-2 hover:text-blue-600">
+                    カテゴリー
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[200px] gap-1 p-2">
+                      {categories.map((category) => (
+                        <li
+                          key={category}
+                          className="py-1 px-2 hover:bg-gray-100 rounded-md"
+                        >
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={`/category/${category}`}
+                              className="block"
+                            >
+                              {category}
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className="px-4 py-2 hover:text-blue-600"
+                  >
+                    <Link href="/create">作成する</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
 
-          <div className="flex gap-2">
+          <div className="flex space-x-3">
             <Button
               asChild
               variant="default"
-              className="bg-blue-600 hover:bg-blue-700 min-w-[84px]"
+              className="bg-blue-600 hover:bg-blue-700"
             >
-              <Link href="/signup">Sign up</Link>
+              <Link href="/signup">登録</Link>
             </Button>
             <Button
               asChild
               variant="outline"
-              className="bg-gray-100 border-none min-w-[84px]"
+              className="bg-gray-100 hover:bg-gray-200 border-gray-200"
             >
-              <Link href="/login">Log in</Link>
+              <Link href="/login">ログイン</Link>
             </Button>
           </div>
         </div>
