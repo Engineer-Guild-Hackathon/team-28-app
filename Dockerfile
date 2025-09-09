@@ -5,7 +5,7 @@ COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ .
 # 静的ファイルを out/ に出力
-RUN npm run export  
+RUN npm run build
 
 # --- Stage 2: Backend ---
 FROM python:3.12-slim AS backend
