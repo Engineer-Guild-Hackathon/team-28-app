@@ -78,16 +78,7 @@ const dummyPolls = [
 ];
 
 // カテゴリーのリスト
-const categories = [
-  "すべて",
-  "一般",
-  "食べ物",
-  "ライフスタイル",
-  "テクノロジー",
-  "エンタメ",
-  "スポーツ",
-  "政治",
-];
+import { categories } from "@/constants/categories";
 
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
