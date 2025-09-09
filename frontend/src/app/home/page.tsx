@@ -77,16 +77,7 @@ const popularPolls = [
 ];
 
 // カテゴリーのリスト
-const categories = [
-  "すべて",
-  "一般",
-  "食べ物",
-  "ライフスタイル",
-  "テクノロジー",
-  "エンタメ",
-  "スポーツ",
-  "政治",
-];
+import { categories } from "@/constants/categories";
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("すべて");
