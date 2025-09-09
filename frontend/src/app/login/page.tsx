@@ -31,7 +31,11 @@ export default function Page() {
       setMessage("Login successful!");
     } catch (err) {
       console.error(err);
-      setMessage("An error occurred");
+      const errorMsg =
+        err instanceof Error
+          ? `An error occurred: ${err.message}`
+          : `An error occurred: ${String(err)}`;
+      setMessage(errorMsg);
     }
   };
 
