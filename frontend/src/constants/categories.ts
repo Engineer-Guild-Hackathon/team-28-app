@@ -1,3 +1,4 @@
+// カテゴリーのリスト
 export const categories = [
   "すべて",
   "一般",

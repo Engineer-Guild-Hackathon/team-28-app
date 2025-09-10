@@ -83,7 +83,7 @@ export default function Header() {
                     asChild
                     className="px-4 py-2 hover:text-blue-600"
                   >
-                    <Link href="/create">作成する</Link>
+                    <Link href="/poll/new">作成する</Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               </NavigationMenuList>
