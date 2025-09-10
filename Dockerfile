@@ -21,5 +21,5 @@ COPY --from=frontend-builder /app/frontend/out ./backend/app/static
 ENV PORT=8080
 
 # FastAPI の static 配下に Next の静的ファイルをマウント
-WORKDIR /app/backend
+WORKDIR /app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
