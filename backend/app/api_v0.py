@@ -58,18 +58,4 @@ class Vote(Base):
 api_v0_router = APIRouter(prefix="/api/v0")
 
 
-# @api_v0_router.get("/issue_user")
-# async def ():
-# 	return {"": ""}
-
-# @api_v0_router.get("/login")
-# async def ():
-# 	return {"": ""}
-
-# @api_v0_router.get("/search")
-# async def ():
-# 	return {"": ""}
-
-# @api_v0_router.get("/get_user_info")
-# async def ():
-# 	return {"": ""}
+# TODO: Add additional API endpoints for user management, login, search, and user info as needed.
