@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Header from "@/components/common/header";
@@ -16,7 +15,6 @@ const dummyPolls = [
     options: ["春", "夏", "秋", "冬"],
     creator: {
       name: "山田太郎",
-      avatar: "https://i.pravatar.cc/150?img=1",
     },
     category: "一般",
   },
@@ -27,7 +25,6 @@ const dummyPolls = [
     options: ["ラーメン", "寿司", "カレー", "ピザ", "パスタ"],
     creator: {
       name: "佐藤花子",
-      avatar: "https://i.pravatar.cc/150?img=5",
     },
     category: "食べ物",
   },
@@ -44,7 +41,6 @@ const dummyPolls = [
     ],
     creator: {
       name: "鈴木一郎",
-      avatar: "https://i.pravatar.cc/150?img=3",
     },
     category: "ライフスタイル",
   },
@@ -55,7 +51,6 @@ const dummyPolls = [
     options: ["Twitter", "Instagram", "Facebook", "TikTok", "LinkedIn"],
     creator: {
       name: "田中美咲",
-      avatar: "https://i.pravatar.cc/150?img=2",
     },
     category: "テクノロジー",
   },
@@ -71,7 +66,6 @@ const dummyPolls = [
     ],
     creator: {
       name: "高橋健太",
-      avatar: "https://i.pravatar.cc/150?img=8",
     },
     category: "エンタメ",
   },
@@ -239,12 +233,6 @@ export default function SearchPage() {
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
-                      <Avatar className="h-6 w-6">
-                        <img
-                          src={poll.creator.avatar}
-                          alt={poll.creator.name}
-                        />
-                      </Avatar>
                       <span className="ml-2 text-xs text-gray-500">
                         {poll.creator.name}
                       </span>

@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import Header from "@/components/common/header";
 import { useRouter } from "next/navigation";
@@ -13,25 +12,8 @@ export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
   const router = useRouter();
-
-  // アバター画像アップロード処理
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setAvatarFile(file);
-
-      // 画像プレビュー用のURL作成
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   // サインアップ処理
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,10 +30,6 @@ export default function SignupPage() {
       const formData = new FormData();
       formData.append("username", username);
       formData.append("password", password);
-
-      if (avatarFile) {
-        formData.append("avatar", avatarFile);
-      }
 
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
       const signupUrl = `${apiBaseUrl}/auth/signup`;
@@ -111,38 +89,6 @@ export default function SignupPage() {
             onSubmit={handleSubmit}
             className="w-full max-w-[480px] space-y-3"
           >
-            {/* アバターアップロード */}
-            <div className="flex flex-col items-center justify-center py-4">
-              <Avatar className="w-24 h-24 mb-4">
-                {avatarPreview ? (
-                  <AvatarImage src={avatarPreview} alt="プロフィール画像" />
-                ) : (
-                  <AvatarFallback className="bg-blue-100 text-blue-600 text-2xl">
-                    {username ? username.charAt(0).toUpperCase() : "U"}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-
-              <div className="flex flex-col items-center">
-                <Label
-                  htmlFor="avatar-upload"
-                  className="cursor-pointer px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm font-medium text-gray-700"
-                >
-                  プロフィール画像を選択
-                </Label>
-                <Input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="hidden"
-                />
-                <p className="mt-2 text-xs text-gray-500">
-                  JPG, PNG, GIF形式, 最大サイズ: 2MB
-                </p>
-              </div>
-            </div>
-
             {/* ユーザー名 */}
             <div className="px-4 py-2">
               <Label
