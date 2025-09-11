@@ -8,7 +8,7 @@ from sqlalchemy.orm import declarative_base
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL environment variable must be set and must not use hardcoded credentials.")
-engine = create_async_engine(DATABASE_URL, echo=True, future=True)
+engine = create_async_engine(DATABASE_URL, echo=True)
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
     expire_on_commit=False
