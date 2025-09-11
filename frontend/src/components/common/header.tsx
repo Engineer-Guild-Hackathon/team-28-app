@@ -55,30 +55,6 @@ export default function Header() {
                   </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="px-4 py-2 hover:text-blue-600">
-                    カテゴリー
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[200px] gap-1 p-2">
-                      {categories.map((category) => (
-                        <li
-                          key={category}
-                          className="py-1 px-2 hover:bg-gray-100 rounded-md"
-                        >
-                          <NavigationMenuLink asChild>
-                            <Link
-                              href={`/category/${category}`}
-                              className="block"
-                            >
-                              {category}
-                            </Link>
-                          </NavigationMenuLink>
-                        </li>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
                   <NavigationMenuLink
                     asChild
                     className="px-4 py-2 hover:text-blue-600"

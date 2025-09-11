@@ -26,17 +26,15 @@ export default function SignupPage() {
     }
 
     try {
-      // FormDataを使って画像も一緒に送信
-      const formData = new FormData();
-      formData.append("username", username);
-      formData.append("password", password);
-
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
       const signupUrl = `${apiBaseUrl}/auth/signup`;
 
       const res = await fetch(signupUrl, {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
       });
 
       if (!res.ok) {

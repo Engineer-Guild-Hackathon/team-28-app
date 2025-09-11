@@ -94,14 +94,14 @@ export default function HomePage() {
           <div className="max-w-3xl">
             <h2 className="text-3xl font-bold mb-4">みんなの意見を集めよう</h2>
             <p className="text-xl mb-6">
-              簡単に投票を作成して、友達や同僚と共有できます。意思決定をもっとシンプルに。
+              簡単に投票を作成して、友達や同僚と共有できます。
             </p>
             <Button
               asChild
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100"
             >
-              <Link href="/create">投票を作成する</Link>
+              <Link href="/poll/new">投票を作成する</Link>
             </Button>
           </div>
         </section>
@@ -231,7 +231,7 @@ export default function HomePage() {
                 <h2 className="text-lg font-bold text-gray-900">DecideBox</h2>
               </div>
               <p className="mt-2 text-sm text-gray-500">
-                簡単な投票で、迅速な意思決定を。
+                簡単な投票で、みんなの意見を集めよう
               </p>
             </div>
             <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
