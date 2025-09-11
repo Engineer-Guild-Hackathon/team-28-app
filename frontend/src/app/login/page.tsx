@@ -78,6 +78,7 @@ export default function Page() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="h-14 rounded-lg"
+                required
               />
             </div>
             <div className="px-4 py-2">
@@ -87,6 +88,7 @@ export default function Page() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="h-14 rounded-lg"
+                required
               />
             </div>
 
