@@ -148,7 +148,7 @@ export default function MyPage() {
           {/* メインコンテンツ */}
           <div className="flex-1">
             <Tabs defaultValue="my-polls" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-8">
+              <TabsList className="grid grid-cols-2 mb-8">
                 <TabsTrigger value="my-polls" className="flex items-center">
                   <PenSquare className="h-4 w-4 mr-2" />
                   作成した投票
@@ -156,10 +156,6 @@ export default function MyPage() {
                 <TabsTrigger value="participated" className="flex items-center">
                   <BarChart3 className="h-4 w-4 mr-2" />
                   参加した投票
-                </TabsTrigger>
-                <TabsTrigger value="favorites" className="flex items-center">
-                  <Heart className="h-4 w-4 mr-2" />
-                  お気に入り
                 </TabsTrigger>
               </TabsList>
 
