@@ -213,7 +213,7 @@ export default function SignupPage() {
 
             <div className="w-full text-center px-4 pt-1 pb-3">
               <p className="text-sm text-gray-500">
-                すでにアカウントをお持ちですか？ 　
+                すでにアカウントをお持ちですか？
                 <Link href="/login" className="text-blue-600 hover:underline">
                   ログイン
                 </Link>
