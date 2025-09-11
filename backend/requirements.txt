@@ -3,3 +3,6 @@ uvicorn>=0.24.0
 pydantic>=2.5.0
 python-multipart>=0.0.6
 aiofiles>=23.2.0  # 静的ファイル配信に必要
+sqlalchemy>=2.0.0
+asyncmy>=0.2.7
+uuid6>=2024.1.1
