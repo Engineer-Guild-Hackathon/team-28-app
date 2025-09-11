@@ -1,5 +1,4 @@
 
-from app.main import app
 from fastapi import APIRouter, Depends,  HTTPException
 import os
 import uuid6
@@ -96,7 +95,7 @@ class UserSchema(BaseModel):
 
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 @api_v0_router.get("/users/{user_id}", response_model=UserSchema)

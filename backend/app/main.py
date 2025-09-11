@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from .api_v0 import api_v0_router
-from fastapi.middleware import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 # APIとフロントエンドの統合アプリケーション
 
