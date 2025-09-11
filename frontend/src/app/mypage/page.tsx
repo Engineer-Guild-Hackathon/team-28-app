@@ -136,26 +136,6 @@ export default function MyPage() {
                 <CardTitle className="mt-4 text-xl">{USER_DATA.name}</CardTitle>
                 <p className="text-gray-500">@{USER_DATA.username}</p>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-4">{USER_DATA.bio}</p>
-                <div className="flex justify-center space-x-6 mb-4">
-                  <div className="text-center">
-                    <p className="font-semibold">{USER_DATA.followersCount}</p>
-                    <p className="text-xs text-gray-500">フォロワー</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-semibold">{USER_DATA.followingCount}</p>
-                    <p className="text-xs text-gray-500">フォロー中</p>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 flex items-center">
-                  <CalendarIcon className="h-3 w-3 mr-1" />
-                  {format(USER_DATA.joinedDate, "yyyy年MM月dd日", {
-                    locale: ja,
-                  })}
-                  に登録
-                </p>
-              </CardContent>
               <CardFooter>
                 <Button variant="outline" className="w-full flex items-center">
                   <Settings className="h-4 w-4 mr-2" />

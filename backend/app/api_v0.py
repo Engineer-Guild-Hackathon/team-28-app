@@ -1,10 +1,13 @@
-from fastapi import APIRouter
+from app.main import app
+from fastapi import APIRouter, Depends,  HTTPException
 import os
 import uuid6
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy import Column, String, DateTime, Integer, ForeignKey
 from sqlalchemy.dialects.mysql import BINARY
+from sqlalchemy.future import select
+from pydantic import BaseModel
 
 # SQLAlchemy MySQL (asyncmy) 接続設定
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -59,3 +62,36 @@ api_v0_router = APIRouter(prefix="/api/v0")
 
 
 # TODO: Add additional API endpoints for user management, login, search, and user info as needed.
+
+async def get_db() -> AsyncSession:
+    async with AsyncSessionLocal() as session:
+        yield session
+
+class UserSchema(BaseModel):
+    id: str  # uuid6 を文字列で返す
+    username: str
+    displayname: str
+
+    class Config:
+        orm_mode = True
+
+
+@api_v0_router.get("/users/{user_id}", response_model=UserSchema)
+async def get_user(user_id: str, db: AsyncSession = Depends(get_db)):
+	try:
+		user_uuid = uuid6.UUID(user_id).bytes  # 文字列から BINARY(16) に変換
+	except ValueError:
+		raise HTTPException(status_code=400, detail="Invalid user_id format")
+
+	result = await db.execute(select(User).filter(User.id == user_uuid))
+	user = result.scalar_one_or_none()
+
+	if not user:
+		raise HTTPException(status_code=404, detail="User not found")
+
+	# BINARY(16) を文字列に変換して返す
+	return UserSchema(
+		id=uuid6.UUID(bytes=user.id).hex,
+		username=user.username,
+		displayname=user.displayname
+	)
