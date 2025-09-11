@@ -2,7 +2,6 @@
 
 import Header from "@/components/common/header";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -29,7 +28,6 @@ const USER_DATA = {
   name: "山田 太郎",
   username: "yamada_taro",
   email: "yamada@example.com",
-  avatarUrl: "https://i.pravatar.cc/300",
   bio: "UI/UXデザイナー。新しいテクノロジーに興味があります。趣味は写真撮影とカフェ巡りです。",
   joinedDate: new Date("2023-04-15"),
   followersCount: 128,
@@ -130,12 +128,11 @@ export default function MyPage() {
           <div className="lg:w-1/4">
             <Card className="shadow-md">
               <CardHeader className="flex flex-col items-center pb-2">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={USER_DATA.avatarUrl} alt={USER_DATA.name} />
-                  <AvatarFallback>
+                <div className="h-24 w-24 bg-blue-600 rounded-full flex items-center justify-center mb-3">
+                  <span className="text-white text-3xl font-bold">
                     {USER_DATA.name.substring(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
+                  </span>
+                </div>
                 <CardTitle className="mt-4 text-xl">{USER_DATA.name}</CardTitle>
                 <p className="text-gray-500">@{USER_DATA.username}</p>
               </CardHeader>
