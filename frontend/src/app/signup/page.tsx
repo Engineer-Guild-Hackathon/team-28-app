@@ -7,15 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import Header from "@/components/common/header";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [email, setEmail] = useState("");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   // アバター画像アップロード処理
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +48,6 @@ export default function SignupPage() {
       const formData = new FormData();
       formData.append("username", username);
       formData.append("password", password);
-      formData.append("email", email);
 
       if (avatarFile) {
         formData.append("avatar", avatarFile);
@@ -56,22 +56,20 @@ export default function SignupPage() {
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
       const signupUrl = `${apiBaseUrl}/auth/signup`;
 
-      // 実際のAPIリクエスト (ここではコメントアウト)
-      // const res = await fetch(signupUrl, {
-      //   method: "POST",
-      //   body: formData,
-      // });
+      const res = await fetch(signupUrl, {
+        method: "POST",
+        body: formData,
+      });
 
-      // if (!res.ok) {
-      //   const errorData = await res.json();
-      //   setMessage(`エラー: ${errorData.detail || "登録に失敗しました"}`);
-      //   return;
-      // }
+      if (!res.ok) {
+        const errorData = await res.json();
+        setMessage(`エラー: ${errorData.detail || "登録に失敗しました"}`);
+        return;
+      }
 
-      // ダミーのレスポンス
       setMessage("登録が完了しました！");
-      // 実際のアプリでは登録成功後にログインページなどにリダイレクト
-      // router.push("/login");
+      // ログインページにリダイレクト
+      router.push("/login");
     } catch (err) {
       console.error(err);
       const errorMsg =
@@ -90,7 +88,7 @@ export default function SignupPage() {
       {/* メインコンテンツ */}
       <main className="flex flex-grow items-start justify-center px-4 sm:px-6 lg:px-8 py-5">
         <div className="w-full max-w-[960px] py-5 flex flex-col items-center">
-          <div className="w-full text-center py-7 mb-8">
+          <div className="w-full text-center py-7">
             <h2 className="text-4xl font-bold text-gray-900">アカウント登録</h2>
             <p className="mt-3 text-gray-600">
               DecideBoxコミュニティに参加して、投票を作成したり参加したりしましょう
@@ -164,25 +162,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* メールアドレス */}
-            <div className="px-4 py-2">
-              <Label
-                htmlFor="email"
-                className="text-sm font-medium text-gray-700 mb-1 block"
-              >
-                メールアドレス
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="example@mail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-12 rounded-lg"
-                required
-              />
-            </div>
-
             {/* パスワード */}
             <div className="px-4 py-2">
               <Label
@@ -234,7 +213,7 @@ export default function SignupPage() {
 
             <div className="w-full text-center px-4 pt-1 pb-3">
               <p className="text-sm text-gray-500">
-                すでにアカウントをお持ちですか？{" "}
+                すでにアカウントをお持ちですか？
                 <Link href="/login" className="text-blue-600 hover:underline">
                   ログイン
                 </Link>
