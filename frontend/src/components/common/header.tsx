@@ -43,7 +43,7 @@ export default function Header() {
                     asChild
                     className="px-4 py-2 hover:text-blue-600"
                   >
-                    <Link href="/">ホーム</Link>
+                    <Link href="/home">ホーム</Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
@@ -84,6 +84,14 @@ export default function Header() {
                     className="px-4 py-2 hover:text-blue-600"
                   >
                     <Link href="/poll/new">作成する</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className="px-4 py-2 hover:text-blue-600"
+                  >
+                    <Link href="/mypage">マイページ</Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               </NavigationMenuList>
