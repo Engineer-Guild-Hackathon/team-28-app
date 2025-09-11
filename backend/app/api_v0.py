@@ -1,9 +1,10 @@
-from fastapi import APIRouter
+
 import os
 import uuid6
+from fastapi import APIRouter, Query
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Column, String, DateTime, Integer, ForeignKey
+from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, select
 from sqlalchemy.dialects.mysql import BINARY
 
 # SQLAlchemy MySQL (asyncmy) 接続設定
@@ -66,9 +67,26 @@ api_v0_router = APIRouter(prefix="/api/v0")
 # async def ():
 # 	return {"": ""}
 
-# @api_v0_router.get("/search")
-# async def ():
-# 	return {"": ""}
+
+
+@api_v0_router.get("/polls/search")
+async def search_polls(query: str = Query(..., description="検索文字列")):
+	async with AsyncSessionLocal() as session:
+		from sqlalchemy import select
+		stmt = select(Post).where(Post.title.like(f"%{query}%"))
+		result = await session.execute(stmt)
+		posts = result.scalars().all()
+		themes = [
+			{
+				"theme_id": post.id.hex(),
+				"theme_name": post.title,
+				"create_at": post.date.isoformat(),
+				"category": post.category,
+				"author": post.author.hex() if hasattr(post.author, 'hex') else str(post.author)
+			}
+			for post in posts
+		]
+		return {"themes": themes}
 
 # @api_v0_router.get("/get_user_info")
 # async def ():
