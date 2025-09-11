@@ -66,7 +66,6 @@ INSERT INTO users (id, user_name, display_name, password) VALUES
     (UNHEX(LPAD(HEX(20),16,'0')), 'user20', 'User 20', 'pass20');
 
 -- デバッグ用ダミーデータ（posts）
--- デバッグ用ダミーデータ（posts）
 INSERT INTO posts (id, title, date, category, author) VALUES
     (UNHEX(LPAD(HEX(1),16,'0')), 'Post Title 1', NOW(), 'Category 1', UNHEX(LPAD(HEX(1),16,'0'))),
     (UNHEX(LPAD(HEX(2),16,'0')), 'Post Title 2', NOW(), 'Category 2', UNHEX(LPAD(HEX(2),16,'0'))),
