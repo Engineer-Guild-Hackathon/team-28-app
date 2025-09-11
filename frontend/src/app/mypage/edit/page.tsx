@@ -107,8 +107,6 @@ export default function EditProfilePage() {
   // フォーム送信処理
   function onSubmit(values: z.infer<typeof formSchema>) {
     // APIに送信する処理をここに記述（実際の実装では）
-    console.log(values);
-
     // 送信成功を表示（実際の実装では）
     alert("プロフィールを更新しました");
 
