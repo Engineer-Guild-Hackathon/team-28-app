@@ -164,25 +164,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* メールアドレス */}
-            <div className="px-4 py-2">
-              <Label
-                htmlFor="email"
-                className="text-sm font-medium text-gray-700 mb-1 block"
-              >
-                メールアドレス
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="example@mail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-12 rounded-lg"
-                required
-              />
-            </div>
-
             {/* パスワード */}
             <div className="px-4 py-2">
               <Label
