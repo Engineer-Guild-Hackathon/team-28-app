@@ -12,7 +12,6 @@ export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [email, setEmail] = useState("");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
@@ -47,7 +46,6 @@ export default function SignupPage() {
       const formData = new FormData();
       formData.append("username", username);
       formData.append("password", password);
-      formData.append("email", email);
 
       if (avatarFile) {
         formData.append("avatar", avatarFile);
@@ -90,7 +88,7 @@ export default function SignupPage() {
       {/* メインコンテンツ */}
       <main className="flex flex-grow items-start justify-center px-4 sm:px-6 lg:px-8 py-5">
         <div className="w-full max-w-[960px] py-5 flex flex-col items-center">
-          <div className="w-full text-center py-7 mb-8">
+          <div className="w-full text-center py-7">
             <h2 className="text-4xl font-bold text-gray-900">アカウント登録</h2>
             <p className="mt-3 text-gray-600">
               DecideBoxコミュニティに参加して、投票を作成したり参加したりしましょう
@@ -215,7 +213,7 @@ export default function SignupPage() {
 
             <div className="w-full text-center px-4 pt-1 pb-3">
               <p className="text-sm text-gray-500">
-                すでにアカウントをお持ちですか？{" "}
+                すでにアカウントをお持ちですか？ 　
                 <Link href="/login" className="text-blue-600 hover:underline">
                   ログイン
                 </Link>
