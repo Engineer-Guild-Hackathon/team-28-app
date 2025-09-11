@@ -67,8 +67,6 @@ api_v0_router = APIRouter(prefix="/api/v0")
 # async def ():
 # 	return {"": ""}
 
-
-
 @api_v0_router.get("/polls/search")
 async def search_polls(query: str = Query(..., description="検索文字列")):
 	async with AsyncSessionLocal() as session:
