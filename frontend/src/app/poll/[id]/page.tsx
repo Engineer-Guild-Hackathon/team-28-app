@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { useParams } from "next/navigation";
 import Header from "@/components/common/header";
 import { Button } from "@/components/ui/button";
@@ -137,6 +138,8 @@ export default function PollPage() {
       setIsSubmitting(false);
     }
   };
+
+  const router = useRouter();
 
   // 少し待ってからメッセージを消す
   useEffect(() => {
@@ -299,7 +302,7 @@ export default function PollPage() {
           </CardContent>
 
           <CardFooter className="flex justify-between border-t pt-6">
-            <Button variant="outline" onClick={() => window.history.back()}>
+            <Button variant="outline" onClick={() => router.back()}>
               戻る
             </Button>
             {hasVoted && (
