@@ -12,6 +12,7 @@ CREATE TABLE users (
 CREATE TABLE posts (
     id BINARY(16) PRIMARY KEY NOT NULL,
     title VARCHAR(128) NOT NULL,
+    description VARCHAR(1024) NOT NULL,
     date DATETIME NOT NULL,
     category VARCHAR(32) NOT NULL,
     author BINARY(16) NOT NULL,
