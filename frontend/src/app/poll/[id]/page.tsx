@@ -44,6 +44,15 @@ const DUMMY_POLL = {
   comments: 24,
 };
 
+const formattedDate = (dateString: string) => {
+  try {
+    return format(new Date(dateString), "yyyy年MM月dd日", { locale: ja });
+  } catch (error) {
+    console.error("日付のフォーマットに失敗しました:", error);
+    return dateString;
+  }
+};
+
 export default function PollPage() {
   const params = useParams();
   const pollId = params.id as string;
@@ -121,11 +130,6 @@ export default function PollPage() {
 
       setHasVoted(true);
       setMessage("投票が完了しました！");
-
-      // 少し待ってからメッセージを消す
-      setTimeout(() => {
-        setMessage(null);
-      }, 3000);
     } catch (err) {
       console.error("Error submitting vote:", err);
       setError("投票の送信に失敗しました");
@@ -134,14 +138,16 @@ export default function PollPage() {
     }
   };
 
-  const formattedDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), "yyyy年MM月dd日", { locale: ja });
-    } catch (error) {
-      console.error("日付のフォーマットに失敗しました:", error);
-      return dateString;
-    }
-  };
+  // 少し待ってからメッセージを消す
+  useEffect(() => {
+    if (!message) return;
+
+    const timer = setTimeout(() => {
+      setMessage(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [message]);
 
   return (
     <div className="bg-gray-50 min-h-screen">
