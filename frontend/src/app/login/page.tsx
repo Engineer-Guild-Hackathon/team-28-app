@@ -41,10 +41,6 @@ export default function Page() {
     }
   };
 
-  // カテゴリーはHeaderコンポーネント内で定義
-
-  // TODO: ログイン成功時、失敗時にページにメッセージを表示
-
   return (
     <div className="bg-white min-h-screen flex flex-col">
       {/* 共通ヘッダーコンポーネント */}
