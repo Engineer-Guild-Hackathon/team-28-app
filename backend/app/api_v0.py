@@ -70,7 +70,6 @@ api_v0_router = APIRouter(prefix="/api/v0")
 @api_v0_router.get("/polls/search")
 async def search_polls(query: str = Query(..., description="検索文字列")):
 	async with AsyncSessionLocal() as session:
-		from sqlalchemy import select
 		stmt = select(Post).where(Post.title.like(f"%{query}%"))
 		result = await session.execute(stmt)
 		posts = result.scalars().all()
