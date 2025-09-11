@@ -3,8 +3,9 @@ CREATE DATABASE IF NOT EXISTS `mydb`;
 -- users テーブル
 CREATE TABLE users (
     id BINARY(16) PRIMARY KEY NOT NULL,
-    username VARCHAR(32) UNIQUE NOT NULL,
-    displayname VARCHAR(64) NOT NULL,
+    user_name VARCHAR(32) UNIQUE NOT NULL,
+    display_name VARCHAR(64) NOT NULL,
+    avater_url VARCHAR(1024) NOT NULL,
     password VARCHAR(128) NOT NULL
 );
 
