@@ -108,7 +108,7 @@ export default function EditProfilePage() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // APIに送信する処理をここに記述（実際の実装では）
     // 送信成功を表示（実際の実装では）
-    alert("プロフィールを更新しました");
+    // alert("プロフィールを更新しました");
 
     // マイページに戻る
     router.push("/mypage");
