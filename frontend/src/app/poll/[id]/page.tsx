@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import Header from "@/components/common/header";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -32,7 +31,6 @@ const DUMMY_POLL = {
   createdAt: "2025-09-01T10:00:00Z",
   author: {
     name: "山田太郎",
-    avatar: "https://i.pravatar.cc/150?u=yamada",
   },
   options: [
     { id: "1", text: "JavaScript", votes: 245 },
@@ -202,13 +200,11 @@ export default function PollPage() {
           <CardContent>
             <div className="mb-6">
               <div className="flex items-center mb-3">
-                <Avatar className="h-6 w-6 mr-2">
-                  <AvatarImage
-                    src={poll.author.avatar}
-                    alt={poll.author.name}
-                  />
-                  <AvatarFallback>{poll.author.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <div className="h-6 w-6 bg-blue-600 rounded-full flex items-center justify-center mr-2">
+                  <span className="text-white text-xs font-semibold">
+                    {poll.author.name.charAt(0)}
+                  </span>
+                </div>
                 <span className="text-sm text-gray-600">
                   作成者: {poll.author.name}
                 </span>
