@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # --- Stage 3: Combine frontend + backend ---
 # Node.js は不要なので frontend のビルド結果だけコピー
-COPY --from=frontend-builder /application/frontend/out ./app/static
+COPY --from=frontend-builder /application/frontend/.next ./app/static
 
 # Cloud Run では PORT 環境変数を使用
 ENV PORT=8080
