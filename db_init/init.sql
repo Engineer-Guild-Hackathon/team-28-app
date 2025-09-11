@@ -36,6 +36,6 @@ CREATE TABLE votes (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-GRANT ALL PRIVILEGES ON `mydatabase`.* TO 'myuser'@'%';
+GRANT ALL PRIVILEGES ON `mydb`.* TO 'myuser'@'%';
 
 FLUSH PRIVILEGES;
