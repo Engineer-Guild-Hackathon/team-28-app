@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import Header from "@/components/common/header";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const [username, setUsername] = useState("");
@@ -15,6 +16,7 @@ export default function SignupPage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   // アバター画像アップロード処理
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,22 +56,20 @@ export default function SignupPage() {
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
       const signupUrl = `${apiBaseUrl}/auth/signup`;
 
-      // 実際のAPIリクエスト (ここではコメントアウト)
-      // const res = await fetch(signupUrl, {
-      //   method: "POST",
-      //   body: formData,
-      // });
+      const res = await fetch(signupUrl, {
+        method: "POST",
+        body: formData,
+      });
 
-      // if (!res.ok) {
-      //   const errorData = await res.json();
-      //   setMessage(`エラー: ${errorData.detail || "登録に失敗しました"}`);
-      //   return;
-      // }
+      if (!res.ok) {
+        const errorData = await res.json();
+        setMessage(`エラー: ${errorData.detail || "登録に失敗しました"}`);
+        return;
+      }
 
-      // ダミーのレスポンス
       setMessage("登録が完了しました！");
-      // 実際のアプリでは登録成功後にログインページなどにリダイレクト
-      // router.push("/login");
+      // ログインページにリダイレクト
+      router.push("/login");
     } catch (err) {
       console.error(err);
       const errorMsg =
