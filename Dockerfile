@@ -15,11 +15,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # --- Stage 3: Combine frontend + backend ---
 # Node.js は不要なので frontend のビルド結果だけコピー
-COPY --from=frontend-builder /application/frontend/out ./backend/app/static
+COPY --from=frontend-builder /application/frontend/out ./app/static
 
 # Cloud Run では PORT 環境変数を使用
 ENV PORT=8080
 
 # FastAPI の static 配下に Next の静的ファイルをマウント
-WORKDIR /application
+WORKDIR /application/
 CMD ["uvicorn", "--host", "0.0.0.0", "--port", "8080", "app.main:app"]

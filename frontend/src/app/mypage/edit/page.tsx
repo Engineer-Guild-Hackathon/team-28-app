@@ -7,7 +7,6 @@ import Header from "@/components/common/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -154,37 +153,6 @@ export default function EditProfilePage() {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <CardContent className="space-y-6">
-                  {/* プロフィール画像 */}
-                  <div className="flex flex-col items-center space-y-4">
-                    <Avatar className="h-28 w-28">
-                      <AvatarImage src={imagePreview} alt="プロフィール画像" />
-                      <AvatarFallback>
-                        {USER_DATA.name.substring(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="flex items-center">
-                      <Label
-                        htmlFor="profile-image"
-                        className="cursor-pointer bg-gray-100 hover:bg-gray-200 py-2 px-4 rounded-md flex items-center"
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        画像をアップロード
-                      </Label>
-                      <Input
-                        id="profile-image"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange}
-                      />
-                    </div>
-
-                    <p className="text-xs text-gray-500">
-                      推奨: 400px × 400px以上、JPG、PNG、GIF形式
-                    </p>
-                  </div>
-
                   {/* 名前 */}
                   <FormField
                     control={form.control}
