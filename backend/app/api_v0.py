@@ -95,7 +95,7 @@ class UserSchema(BaseModel):
 
 
     class Config:
-        from_attributes=True
+        from_attributes = True
 
 
 @api_v0_router.get("/users/{user_id}", response_model=UserSchema)
