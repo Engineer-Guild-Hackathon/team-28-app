@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import Header from "@/components/common/header";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +32,7 @@ export default function Page() {
         return;
       }
 
+      router.push("/mypage");
       setMessage("Login successful!");
     } catch (err) {
       console.error(err);
@@ -90,15 +93,6 @@ export default function Page() {
                 className="h-14 rounded-lg"
                 required
               />
-            </div>
-
-            <div className="w-full text-center px-4 pt-1 pb-3">
-              <Link
-                href="/forgot-password"
-                className="text-sm text-gray-500 hover:underline"
-              >
-                パスワードを忘れましたか？
-              </Link>
             </div>
 
             <div className="px-4 py-3 w-full">
