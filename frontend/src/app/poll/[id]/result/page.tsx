@@ -65,7 +65,6 @@ export default function PollResultPage() {
   const params = useParams();
   const pollId = params.id as string;
   const [pollResult] = useState(DUMMY_POLL_RESULT);
-  const [error] = useState<string | null>(null);
 
   // 本来はここでAPIからデータを取得
   useEffect(() => {
