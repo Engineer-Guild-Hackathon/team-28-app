@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends,  HTTPException
+from fastapi import APIRouter, Depends,  HTTPException, status, Response
 import os
 import uuid6
 from fastapi import APIRouter, Query
@@ -9,6 +9,8 @@ from sqlalchemy.dialects.mysql import BINARY
 from sqlalchemy.future import select
 from pydantic import BaseModel
 from passlib.context import CryptContext
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
 
 # SQLAlchemy MySQL (asyncmy) 接続設定
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -150,3 +152,48 @@ async def create_user(user_data: UserCreateSchema, db: AsyncSession = Depends(ge
 		username=new_user.username,
 		displayname=new_user.displayname
 	)
+
+
+# JWT方式でのユーザーログイン
+class LoginSchema(BaseModel):
+	username: str
+	password: str
+
+class TokenSchema(BaseModel):
+	token: str
+	expires_in: int
+
+def create_access_token(data: dict, expires_delta: timedelta):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    encode_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY"), algorithm=os.getenv("ALGORITHM"))
+    return encode_jwt
+
+@api_v0_router.post("/auth/login")
+async def login(user_data: LoginSchema, db: AsyncSession = Depends(get_db), response: Response = None):
+    result = await db.execute(select(User).filter(User.username == user_data.username))
+    user = result.scalar_one_or_none()
+    if not user or not pwd_context.verify(user_data.password, user.password):
+        raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Invalid username or password",
+			headers={"WWW-Authenticate": "Bearer"},
+		)
+        
+    access_token_expires = timedelta(minutes=60)
+    token = create_access_token(
+		data={"sub": user.username}, expires_delta=access_token_expires
+	)
+    
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=True,
+        max_age=int(access_token_expires.total_seconds())
+	)
+    
+    return {"message": "Logged in successfully"}
+
