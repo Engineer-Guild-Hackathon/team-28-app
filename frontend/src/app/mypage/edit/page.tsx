@@ -7,6 +7,7 @@ import Header from "@/components/common/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Toast from "@/components/ui/toast";
 import {
   Card,
   CardContent,
@@ -28,36 +29,25 @@ import { ArrowLeft, Upload } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { User } from "@/types/user";
 
-// ダミーデータ - マイページと同じデータを使用
-const USER_DATA = {
-  id: "user123",
-  name: "山田 太郎",
-  username: "yamada_taro",
-  email: "yamada@example.com",
-  avatarUrl: "https://i.pravatar.cc/300",
-  bio: "UI/UXデザイナー。新しいテクノロジーに興味があります。趣味は写真撮影とカフェ巡りです。",
-  joinedDate: new Date("2023-04-15"),
-  followersCount: 128,
-  followingCount: 95,
+const USER_DATA: User = {
+  username: "山田太郎",
+  displayname: "yamada_taro",
 };
 
 // フォームのバリデーションスキーマ
+// TODO: 8文字以上のパスワードを強制
 const formSchema = z
   .object({
     username: z.string().min(3, {
       message: "ユーザー名は3文字以上である必要があります。",
     }),
-    name: z.string().min(1, {
-      message: "名前を入力してください。",
+    displayname: z.string().min(1, {
+      message: "表示名を入力してください。",
     }),
     currentPassword: z.string().optional(),
-    newPassword: z
-      .string()
-      .min(8, {
-        message: "新しいパスワードは8文字以上である必要があります。",
-      })
-      .optional(),
+    newPassword: z.string().optional(),
     confirmPassword: z.string().optional(),
   })
   .refine(
@@ -89,14 +79,16 @@ const formSchema = z
 
 export default function EditProfilePage() {
   const router = useRouter();
-  const [imagePreview, setImagePreview] = useState<string>(USER_DATA.avatarUrl);
+  const [message, setMessage] = useState<string | null>(null);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastType, setToastType] = useState<"success" | "error">("success");
 
   // React Hook Formの設定
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: USER_DATA.username,
-      name: USER_DATA.name,
+      displayname: USER_DATA.displayname,
       currentPassword: "",
       newPassword: "",
       confirmPassword: "",
@@ -105,32 +97,44 @@ export default function EditProfilePage() {
 
   // フォーム送信処理
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // APIに送信する処理をここに記述（実際の実装では）
-    // 送信成功を表示（実際の実装では）
-    // alert("プロフィールを更新しました");
+    fetch("/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(values),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("更新に失敗しました");
+        }
+        // 成功時の処理
+        setMessage("プロフィールを更新しました");
+        setToastType("success");
+        setToastVisible(true);
 
-    // マイページに戻る
-    router.push("/mypage");
-  }
-
-  // 画像アップロード処理
-  function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (file) {
-      // FileReaderを使用してプレビュー表示
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      // 実際の実装では、ここでアップロード処理を行う
-    }
+        // 3秒後にマイページへ遷移
+        setTimeout(() => {
+          router.push("/mypage");
+        }, 3000);
+      })
+      .catch((err) => {
+        // エラー時の処理
+        setMessage(err instanceof Error ? err.message : "エラーが発生しました");
+        setToastType("error");
+        setToastVisible(true);
+      });
   }
 
   return (
     <>
       <Header />
+      {toastVisible && message && (
+        <Toast
+          message={message}
+          type={toastType}
+          onClose={() => setToastVisible(false)}
+        />
+      )}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 戻るボタン */}
         <Link
@@ -156,7 +160,7 @@ export default function EditProfilePage() {
                   {/* 名前 */}
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="username"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>名前</FormLabel>
@@ -171,13 +175,13 @@ export default function EditProfilePage() {
                     )}
                   />
 
-                  {/* ユーザー名 */}
+                  {/* 表示名 */}
                   <FormField
                     control={form.control}
-                    name="username"
+                    name="displayname"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>ユーザー名</FormLabel>
+                        <FormLabel>表示名</FormLabel>
                         <FormControl>
                           <Input placeholder="ユーザー名を入力" {...field} />
                         </FormControl>

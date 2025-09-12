@@ -31,7 +31,8 @@ const DUMMY_POLL_RESULT = {
   title: "好きなプログラミング言語は？",
   description:
     "あなたが最も好きなプログラミング言語を教えてください。理由もコメントで共有できます。",
-  category: "テクノロジー",
+  category: 5, // テクノロジーのID
+  categoryText: "テクノロジー", // カテゴリー表示用
   createdAt: "2025-09-01T10:00:00Z",
   endAt: "2025-10-01T10:00:00Z", // 投票終了日時
   author: {
@@ -116,7 +117,7 @@ export default function PollResultPage() {
             <div className="flex justify-between items-start">
               <div>
                 <Badge variant="outline" className="mb-2">
-                  {pollResult.category}
+                  {pollResult.categoryText}
                 </Badge>
                 <div className="flex items-center space-x-2 mb-2">
                   <CardTitle className="text-2xl">{pollResult.title}</CardTitle>

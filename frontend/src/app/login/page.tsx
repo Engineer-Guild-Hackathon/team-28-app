@@ -16,22 +16,41 @@ export default function Page() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const loginUrl = `${apiBaseUrl}/auth/login`;
+      const loginUrl = `/api/v0/auth/login`;
       const res = await fetch(loginUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
+        credentials: "include", // Cookieを送信・受信するために必要
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        setMessage(`Error: ${errorData.detail || "Login failed"}`);
+        // レスポンスがJSONかどうかをContent-Typeヘッダーで判断
+        const contentType = res.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+          // JSONの場合
+          try {
+            const errorData = await res.json();
+            setMessage(`Error: ${errorData.detail || "Login failed"}`);
+          } catch (e) {
+            setMessage("Error: Failed to parse error response");
+          }
+        } else {
+          // JSON以外の場合
+          try {
+            const text = await res.text();
+            setMessage(`Error: ${text || "Login failed"}`);
+          } catch (e) {
+            setMessage("Error: Failed to read error response");
+          }
+        }
         return;
       }
 
+      // ログイン成功
       router.push("/mypage");
       setMessage("Login successful!");
     } catch (err) {
