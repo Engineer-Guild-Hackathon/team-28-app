@@ -26,8 +26,8 @@ Base = declarative_base()
 class User(Base):
 	__tablename__ = "users"
 	id = Column(BINARY(16), primary_key=True, nullable=False, default=lambda: uuid6.uuid7().bytes)
-	username = Column(String(32), unique=True, nullable=False)
-	displayname = Column(String(64), nullable=False)
+	username = Column("user_name",String(32), unique=True, nullable=False)
+	displayname = Column("display_name",String(64), nullable=False)
 	password = Column(String(128), nullable=False)  # argon2id hash
 	posts = relationship("Post", back_populates="author_obj")
 	votes = relationship("Vote", back_populates="user_obj")
@@ -147,6 +147,6 @@ async def create_user(user_data: UserCreateSchema, db: AsyncSession = Depends(ge
 	await db.refresh(new_user)
 	return UserSchema(
 		id=uuid6.UUID(bytes=new_user.id).hex,
-		username=new_user.user_name,
-		displayname=new_user.display_name
+		username=new_user.username,
+		displayname=new_user.displayname
 	)
