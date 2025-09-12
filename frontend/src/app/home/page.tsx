@@ -24,12 +24,11 @@ export default function HomePage() {
       setError(null);
 
       try {
-        // カテゴリーIDを文字列に変換して渡す（API側の対応が完了するまでの暫定対応）
-        const categoryText =
-          selectedCategory === 1
-            ? ""
-            : categoryMap[selectedCategory as keyof typeof categoryMap];
-        const response = await getPollsByCategory(categoryText);
+        // カテゴリーIDを数値として渡す
+        // "すべて"(ID:1)の場合はundefinedを渡して全ての投票を取得
+        const categoryId =
+          selectedCategory === 1 ? undefined : selectedCategory;
+        const response = await getPollsByCategory(categoryId);
         setPolls(response.themes);
       } catch (err) {
         console.error("カテゴリー検索エラー:", err);
