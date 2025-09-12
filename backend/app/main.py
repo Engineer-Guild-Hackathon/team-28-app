@@ -13,7 +13,7 @@ app.include_router(api_v0_router)
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
-    app.mount("/_next", StaticFiles(directory=static_dir), name="next")
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
 origins = [
     "http://localhost:3000"
@@ -26,9 +26,5 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
 
 
