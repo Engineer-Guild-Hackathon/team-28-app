@@ -14,7 +14,7 @@ CREATE TABLE posts (
     title VARCHAR(128) NOT NULL,
     description VARCHAR(1024) NOT NULL,
     created_at DATETIME NOT NULL,
-    category VARCHAR(32) NOT NULL,
+    category INT NOT NULL,
     author BINARY(16) NOT NULL,
     FOREIGN KEY (author) REFERENCES users(id)
 );
@@ -68,26 +68,26 @@ INSERT INTO users (id, user_name, display_name, password) VALUES
 
 -- デバッグ用ダミーデータ（posts）
 INSERT INTO posts (id, title, created_at, category, author) VALUES
-    (UNHEX(LPAD(HEX(1),16,'0')), 'Post Title 1', NOW(), '1', UNHEX(LPAD(HEX(1),16,'0'))),
-    (UNHEX(LPAD(HEX(2),16,'0')), 'Post Title 2', NOW(), '2', UNHEX(LPAD(HEX(2),16,'0'))),
-    (UNHEX(LPAD(HEX(3),16,'0')), 'Post Title 3', NOW(), '3', UNHEX(LPAD(HEX(3),16,'0'))),
-    (UNHEX(LPAD(HEX(4),16,'0')), 'Post Title 4', NOW(), '4', UNHEX(LPAD(HEX(4),16,'0'))),
-    (UNHEX(LPAD(HEX(5),16,'0')), 'Post Title 5', NOW(), '5', UNHEX(LPAD(HEX(5),16,'0'))),
-    (UNHEX(LPAD(HEX(6),16,'0')), 'Post Title 6', NOW(), '1', UNHEX(LPAD(HEX(6),16,'0'))),
-    (UNHEX(LPAD(HEX(7),16,'0')), 'Post Title 7', NOW(), '2', UNHEX(LPAD(HEX(7),16,'0'))),
-    (UNHEX(LPAD(HEX(8),16,'0')), 'Post Title 8', NOW(), '3', UNHEX(LPAD(HEX(8),16,'0'))),
-    (UNHEX(LPAD(HEX(9),16,'0')), 'Post Title 9', NOW(), '4', UNHEX(LPAD(HEX(9),16,'0'))),
-    (UNHEX(LPAD(HEX(10),16,'0')), 'Post Title 10', NOW(), '5', UNHEX(LPAD(HEX(10),16,'0'))),
-    (UNHEX(LPAD(HEX(11),16,'0')), 'Post Title 11', NOW(), '1', UNHEX(LPAD(HEX(11),16,'0'))),
-    (UNHEX(LPAD(HEX(12),16,'0')), 'Post Title 12', NOW(), '2', UNHEX(LPAD(HEX(12),16,'0'))),
-    (UNHEX(LPAD(HEX(13),16,'0')), 'Post Title 13', NOW(), '3', UNHEX(LPAD(HEX(13),16,'0'))),
-    (UNHEX(LPAD(HEX(14),16,'0')), 'Post Title 14', NOW(), '4', UNHEX(LPAD(HEX(14),16,'0'))),
-    (UNHEX(LPAD(HEX(15),16,'0')), 'Post Title 15', NOW(), '5', UNHEX(LPAD(HEX(15),16,'0'))),
-    (UNHEX(LPAD(HEX(16),16,'0')), 'Post Title 16', NOW(), '1', UNHEX(LPAD(HEX(16),16,'0'))),
-    (UNHEX(LPAD(HEX(17),16,'0')), 'Post Title 17', NOW(), '2', UNHEX(LPAD(HEX(17),16,'0'))),
-    (UNHEX(LPAD(HEX(18),16,'0')), 'Post Title 18', NOW(), '3', UNHEX(LPAD(HEX(18),16,'0'))),
-    (UNHEX(LPAD(HEX(19),16,'0')), 'Post Title 19', NOW(), '4', UNHEX(LPAD(HEX(19),16,'0'))),
-    (UNHEX(LPAD(HEX(20),16,'0')), 'Post Title 20', NOW(), '5', UNHEX(LPAD(HEX(20),16,'0')));
+    (UNHEX(LPAD(HEX(1),16,'0')), 'Post Title 1', NOW(), 3, UNHEX(LPAD(HEX(1),16,'0'))),
+    (UNHEX(LPAD(HEX(2),16,'0')), 'Post Title 2', NOW(), 7, UNHEX(LPAD(HEX(2),16,'0'))),
+    (UNHEX(LPAD(HEX(3),16,'0')), 'Post Title 3', NOW(), 2, UNHEX(LPAD(HEX(3),16,'0'))),
+    (UNHEX(LPAD(HEX(4),16,'0')), 'Post Title 4', NOW(), 5, UNHEX(LPAD(HEX(4),16,'0'))),
+    (UNHEX(LPAD(HEX(5),16,'0')), 'Post Title 5', NOW(), 1, UNHEX(LPAD(HEX(5),16,'0'))),
+    (UNHEX(LPAD(HEX(6),16,'0')), 'Post Title 6', NOW(), 8, UNHEX(LPAD(HEX(6),16,'0'))),
+    (UNHEX(LPAD(HEX(7),16,'0')), 'Post Title 7', NOW(), 4, UNHEX(LPAD(HEX(7),16,'0'))),
+    (UNHEX(LPAD(HEX(8),16,'0')), 'Post Title 8', NOW(), 6, UNHEX(LPAD(HEX(8),16,'0'))),
+    (UNHEX(LPAD(HEX(9),16,'0')), 'Post Title 9', NOW(), 2, UNHEX(LPAD(HEX(9),16,'0'))),
+    (UNHEX(LPAD(HEX(10),16,'0')), 'Post Title 10', NOW(), 7, UNHEX(LPAD(HEX(10),16,'0'))),
+    (UNHEX(LPAD(HEX(11),16,'0')), 'Post Title 11', NOW(), 3, UNHEX(LPAD(HEX(11),16,'0'))),
+    (UNHEX(LPAD(HEX(12),16,'0')), 'Post Title 12', NOW(), 1, UNHEX(LPAD(HEX(12),16,'0'))),
+    (UNHEX(LPAD(HEX(13),16,'0')), 'Post Title 13', NOW(), 8, UNHEX(LPAD(HEX(13),16,'0'))),
+    (UNHEX(LPAD(HEX(14),16,'0')), 'Post Title 14', NOW(), 5, UNHEX(LPAD(HEX(14),16,'0'))),
+    (UNHEX(LPAD(HEX(15),16,'0')), 'Post Title 15', NOW(), 4, UNHEX(LPAD(HEX(15),16,'0'))),
+    (UNHEX(LPAD(HEX(16),16,'0')), 'Post Title 16', NOW(), 6, UNHEX(LPAD(HEX(16),16,'0'))),
+    (UNHEX(LPAD(HEX(17),16,'0')), 'Post Title 17', NOW(), 2, UNHEX(LPAD(HEX(17),16,'0'))),
+    (UNHEX(LPAD(HEX(18),16,'0')), 'Post Title 18', NOW(), 7, UNHEX(LPAD(HEX(18),16,'0'))),
+    (UNHEX(LPAD(HEX(19),16,'0')), 'Post Title 19', NOW(), 1, UNHEX(LPAD(HEX(19),16,'0'))),
+    (UNHEX(LPAD(HEX(20),16,'0')), 'Post Title 20', NOW(), 8, UNHEX(LPAD(HEX(20),16,'0')));
 
 -- デバッグ用ダミーデータ（choices）
 INSERT INTO choices (post_id, choice, number) VALUES
