@@ -17,7 +17,7 @@ export interface PollResponse {
 
 // ユーザー情報の型定義
 export interface User {
-  user_id: string;
+  id: string; // user_id から id に変更してバックエンドと一致させる
   username: string;
   displayname?: string;
 }
@@ -57,7 +57,9 @@ export async function searchPolls(query?: string): Promise<PollResponse> {
     query ? `?query=${encodeURIComponent(query)}` : ""
   }`;
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    credentials: "include", // Cookieを送信するために必要
+  });
   if (!response.ok) {
     throw new Error("検索に失敗しました");
   }
@@ -65,18 +67,27 @@ export async function searchPolls(query?: string): Promise<PollResponse> {
   return await response.json();
 }
 
-// 投票検索API（カテゴリーで検索）
+// 投票検索API（カテゴリーで検索）- 数値IDを使用するように修正
 export async function getPollsByCategory(
-  category: string
+  categoryId?: number
 ): Promise<PollResponse> {
-  // 注意: このエンドポイントは後で実装予定のため、現在は検索APIを使用
-  const url = `${API_BASE_URL}/polls/search?query=${encodeURIComponent(
-    category
-  )}`;
+  // カテゴリIDをクエリパラメータとして渡す
+  const url = `${API_BASE_URL}/polls${
+    categoryId ? `?category=${categoryId}` : ""
+  }`;
 
+  // /polls エンドポイントは認証が不要なのでcredentialsを省略
   const response = await fetch(url);
+
+  // ステータスコードに基づいてより詳細なエラーメッセージを表示
   if (!response.ok) {
-    throw new Error("カテゴリー検索に失敗しました");
+    if (response.status === 401) {
+      throw new Error("認証が必要です。ログインしてください。");
+    } else if (response.status === 404) {
+      throw new Error("投票データが見つかりませんでした。");
+    } else {
+      throw new Error(`カテゴリー検索に失敗しました (${response.status})`);
+    }
   }
 
   return await response.json();

@@ -74,7 +74,7 @@ export default function MyPage() {
         const userData = await getUserInfo();
         setUser({
           username: userData.username,
-          displayname: userData.displayname || userData.user_id.substring(0, 8),
+          displayname: userData.displayname || userData.id.substring(0, 8),
         });
 
         // 作成した投票の取得
