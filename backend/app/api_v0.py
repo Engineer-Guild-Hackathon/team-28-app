@@ -1,5 +1,5 @@
 
-from fastapi import APIRouter, Depends,  HTTPException, status, Response, Header
+from fastapi import Cookie,APIRouter, Depends,  HTTPException, status, Response, Header
 import os
 import uuid6
 from fastapi import APIRouter, Query
@@ -72,9 +72,11 @@ async def get_db() -> AsyncSession:
         yield session
 
 # JWTトークンの検証関数
-async def verify_token(authorization: str = Header(..., description="認証用のJWT")):
+async def verify_token(access_token: str = Cookie(None)):
+	if access_token is None:
+		raise HTTPException(status_code=401, detail="Authorization token missing")
 	try:
-		payload = jwt.decode(authorization, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")])
+		payload = jwt.decode(access_token, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")])
 		username: str = payload.get("sub")
 		if username is None:
 			raise HTTPException(status_code=401, detail="Invalid token")
@@ -204,7 +206,7 @@ async def login(user_data: LoginSchema, db: AsyncSession = Depends(get_db), resp
         value=token,
         httponly=True,
         samesite="lax",
-        secure=True,
+        secure=False, # 本番環境ではTrueにする
         max_age=int(access_token_expires.total_seconds())
 	)
     
