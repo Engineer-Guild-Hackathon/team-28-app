@@ -23,11 +23,7 @@ import {
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useEffect, useState } from "react";
-
-interface User {
-  username: string;
-  displayname: string;
-}
+import { User } from "@/types/user";
 
 const USER_DATA: User = {
   username: "山田太郎",
