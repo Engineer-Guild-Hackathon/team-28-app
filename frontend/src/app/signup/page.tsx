@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const [username, setUsername] = useState("");
+  const [displayname, setDisplayname] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -34,12 +35,11 @@ export default function SignupPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, displayname, password }),
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        setMessage(`エラー: ${errorData.detail || "登録に失敗しました"}`);
+        setMessage("エラー: そのユーザーは既に存在します");
         return;
       }
 
@@ -47,12 +47,8 @@ export default function SignupPage() {
       // ログインページにリダイレクト
       router.push("/login");
     } catch (err) {
-      console.error(err);
-      const errorMsg =
-        err instanceof Error
-          ? `エラーが発生しました: ${err.message}`
-          : `エラーが発生しました: ${String(err)}`;
-      setMessage(errorMsg);
+      console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
+      setMessage("エラー: サーバー側のエラーです");
     }
   };
 
@@ -104,6 +100,24 @@ export default function SignupPage() {
                 className="h-12 rounded-lg"
                 required
               />
+            </div>
+
+            <div className="px-4 py-2">
+              <Label
+                htmlFor="displayname"
+                className="text-sm font-medium text-gray-700 mb-1 block"
+              >
+                表示名
+                <Input
+                  id="displayname"
+                  type="text"
+                  placeholder="表示名"
+                  value={displayname}
+                  onChange={(e) => setDisplayname(e.target.value)}
+                  className="h-12 rounded-lg mt-1"
+                  required
+                />
+              </Label>
             </div>
 
             {/* パスワード */}
