@@ -25,7 +25,8 @@ CREATE TABLE choices (
     post_id BINARY(16) NOT NULL,
     choice VARCHAR(64) NOT NULL,
     number INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (post_id) REFERENCES posts(id)
+    FOREIGN KEY (post_id) REFERENCES posts(id),
+    UNIQUE KEY unique_post_choice_number (post_id, number)
 );
 
 -- votes テーブル
