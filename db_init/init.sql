@@ -13,7 +13,7 @@ CREATE TABLE posts (
     id BINARY(16) PRIMARY KEY NOT NULL,
     title VARCHAR(128) NOT NULL,
     description VARCHAR(1024) NOT NULL,
-    date DATETIME NOT NULL,
+    created_at DATETIME NOT NULL,
     category VARCHAR(32) NOT NULL,
     author BINARY(16) NOT NULL,
     FOREIGN KEY (author) REFERENCES users(id)
@@ -67,7 +67,7 @@ INSERT INTO users (id, user_name, display_name, password) VALUES
     (UNHEX(LPAD(HEX(20),16,'0')), 'user20', 'User 20', 'pass20');
 
 -- デバッグ用ダミーデータ（posts）
-INSERT INTO posts (id, title, date, category, author) VALUES
+INSERT INTO posts (id, title, created_at, category, author) VALUES
     (UNHEX(LPAD(HEX(1),16,'0')), 'Post Title 1', NOW(), '1', UNHEX(LPAD(HEX(1),16,'0'))),
     (UNHEX(LPAD(HEX(2),16,'0')), 'Post Title 2', NOW(), '2', UNHEX(LPAD(HEX(2),16,'0'))),
     (UNHEX(LPAD(HEX(3),16,'0')), 'Post Title 3', NOW(), '3', UNHEX(LPAD(HEX(3),16,'0'))),

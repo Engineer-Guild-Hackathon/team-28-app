@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends,  HTTPException, status, Response
 import os
 import uuid6
@@ -38,7 +37,8 @@ class Post(Base):
 	__tablename__ = "posts"
 	id = Column(BINARY(16), primary_key=True, nullable=False, default=lambda: uuid6.uuid7().bytes)
 	title = Column(String(128), nullable=False)
-	date = Column(DateTime, nullable=False)
+	description = Column(String(1024), nullable=True)
+	created_at = Column(DateTime, nullable=False)
 	category = Column(String(32), nullable=False)
 	author = Column(BINARY(16), ForeignKey("users.id"), nullable=False)
 	author_obj = relationship("User", back_populates="posts")
@@ -83,7 +83,7 @@ async def search_polls(query: str = Query(..., description="検索文字列")):
 			{
 				"theme_id": post.id.hex(),
 				"theme_name": post.title,
-				"create_at": post.date.isoformat(),
+				"create_at": post.created_at.isoformat(),
 				"category": post.category,
 				"author": post.author.hex() if hasattr(post.author, 'hex') else str(post.author)
 			}
