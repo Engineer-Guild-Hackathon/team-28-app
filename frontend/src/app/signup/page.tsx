@@ -47,7 +47,6 @@ export default function SignupPage() {
       // ログインページにリダイレクト
       router.push("/login");
     } catch (err) {
-      console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
       setMessage("エラー: サーバー側のエラーです");
     }
   };
