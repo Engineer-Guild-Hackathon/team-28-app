@@ -87,7 +87,7 @@ export default function MyPage() {
           categoryText: getCategoryText(poll.category), // カテゴリーIDからテキストに変換
           createdAt: formatDate(poll.create_at),
           votesCount: Math.floor(Math.random() * 300), // 仮データ（実際はAPIから取得）
-          commentsCount: Math.floor(Math.random() * 50), // 仮データ（実際はAPIから取得）
+          // commentsCount: Math.floor(Math.random() * 50), // 仮データ（実際はAPIから取得） 削除
         }));
         setMyPolls(formattedMyPolls);
 
