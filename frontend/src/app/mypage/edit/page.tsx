@@ -44,7 +44,7 @@ const formSchema = z
       message: "ユーザー名は3文字以上である必要があります。",
     }),
     displayname: z.string().min(1, {
-      message: "表示を入力してください。",
+      message: "表示名を入力してください。",
     }),
     currentPassword: z.string().optional(),
     newPassword: z.string().optional(),
