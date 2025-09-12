@@ -11,10 +11,6 @@ app = FastAPI()
 # /api/v0ルーターを登録
 app.include_router(api_v0_router)
 
-static_dir = os.path.join(os.path.dirname(__file__), "static")
-if os.path.exists(static_dir):
-    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
-
 origins = [
     "http://localhost:3000"
 ]
