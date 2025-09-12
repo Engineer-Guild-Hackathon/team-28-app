@@ -6,8 +6,8 @@
 
 ## チーム情報
 - チーム番号: 28番
-- チーム名:  信州(仮)
-- プロダクト名:  投票(仮)
+- チーム名:  Y2N
+- プロダクト名:  DecideBox
 - メンバー: 
             rainfallseason
             IsseiKitta
@@ -16,5 +16,5 @@
 ---
 
 ## デモ　/ プレゼン資料
-- デモURL: [デモサイト](https://hackathon.french-fly.me)
-- プレゼンURL: [プレゼン資料](https://your-presentation-url.com) <!-- TODO: Replace with actual presentation URL -->
+- デモURL: [デモサイト](https://team-28-app-frontend-629273086549.europe-west1.run.app/home)
+- プレゼンURL: ファイル提出のため無し
