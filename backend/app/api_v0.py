@@ -1,4 +1,4 @@
-from fastapi import Cookie,APIRouter, Depends,  HTTPException, status, Response, Header
+from fastapi import APIRouter, Depends,  HTTPException, status, Response, Cookie
 import os
 import uuid6
 from fastapi import APIRouter, Query
@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from jose import JWTError, jwt, JWTError
 from datetime import datetime, timedelta
+from typing import Optional
 
 # SQLAlchemy MySQL (asyncmy) 接続設定
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -94,11 +95,32 @@ async def search_polls(query: str = Query(..., description="検索文字列"), c
 		posts = result.scalars().all()
 		themes = [
 			{
-				"theme_id": post.id.hex(),
+				"theme_id": uuid6.UUID(bytes=post.id).hex,
 				"theme_name": post.title,
 				"create_at": post.created_at.isoformat(),
 				"category": post.category,
-				"author": post.author.hex() if hasattr(post.author, 'hex') else str(post.author)
+				"author": uuid6.UUID(bytes=post.author).hex
+			}
+			for post in posts
+		]
+		return {"themes": themes}
+
+@api_v0_router.get("/polls")
+async def get_polls_by_category(category: int = Query(None, description="カテゴリーID")):
+	async with AsyncSessionLocal() as session:
+		if category is not None:
+			stmt = select(Post).where(Post.category == category)
+		else:
+			stmt = select(Post)
+		result = await session.execute(stmt)
+		posts = result.scalars().all()
+		themes = [
+			{
+				"theme_id": uuid6.UUID(bytes=post.id).hex,
+				"theme_name": post.title,
+				"create_at": post.created_at.isoformat(),
+				"category": post.category,
+				"author": uuid6.UUID(bytes=post.author).hex
 			}
 			for post in posts
 		]
@@ -136,7 +158,70 @@ async def get_user(user_id: str,
 		displayname=user.displayname
 	)
 
+@api_v0_router.get("/users/{user_id}/polls")
+async def get_user_polls(user_id: str, db: AsyncSession = Depends(get_db)):
+	try:
+		user_uuid = uuid6.UUID(user_id).bytes
+	except ValueError:
+		raise HTTPException(status_code=400, detail="Invalid user_id format")
+
+	result = await db.execute(select(Post).filter(Post.author == user_uuid))
+	posts = result.scalars().all()
+	
+	themes = [
+		{
+			"theme_id": uuid6.UUID(bytes=post.id).hex,
+			"theme_name": post.title,
+			"create_at": post.created_at.isoformat(),
+			"category": post.category,
+			"author": uuid6.UUID(bytes=post.author).hex
+		}
+		for post in posts
+	]
+	return {"themes": themes}
+
+@api_v0_router.get("/users/{user_id}/votes")
+async def get_user_votes(user_id: str, db: AsyncSession = Depends(get_db)):
+	try:
+		user_uuid = uuid6.UUID(user_id).bytes
+	except ValueError:
+		raise HTTPException(status_code=400, detail="Invalid user_id format")
+
+	# ユーザーが投票したpostを取得
+	result = await db.execute(
+		select(Post, Vote.number).join(Vote, Post.id == Vote.post_id).filter(Vote.user_id == user_uuid)
+	)
+	votes = result.all()
+	
+	themes = [
+		{
+			"theme_id": uuid6.UUID(bytes=post.id).hex,
+			"theme_name": post.title,
+			"create_at": post.created_at.isoformat(),
+			"category": post.category,
+			"author": uuid6.UUID(bytes=post.author).hex,
+			"voted_choice": vote_number
+		}
+		for post, vote_number in votes
+	]
+	return {"themes": themes}
+
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+
+class PostCreateSchema(BaseModel):
+	title: str
+	description: str = None
+	category: int
+	choices: list[str]
+
+class UserUpdateSchema(BaseModel):
+	username: Optional[str] = None
+	displayname: Optional[str] = None
+	password: Optional[str] = None
+
+class VoteSchema(BaseModel):
+	choice_number: int
+
 class UserCreateSchema(BaseModel):
 	username: str
 	displayname: str
@@ -185,6 +270,39 @@ def create_access_token(data: dict, expires_delta: timedelta):
     encode_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY"), algorithm=os.getenv("ALGORITHM"))
     return encode_jwt
 
+async def get_current_user(access_token: str = Cookie(None), db: AsyncSession = Depends(get_db)):
+	if not access_token:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="アクセストークンが必要です",
+			headers={"WWW-Authenticate": "Bearer"},
+		)
+	try:
+		payload = jwt.decode(access_token, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")])
+		username: str = payload.get("sub")
+		if username is None:
+			raise HTTPException(
+				status_code=status.HTTP_401_UNAUTHORIZED,
+				detail="無効なトークンです",
+				headers={"WWW-Authenticate": "Bearer"},
+			)
+	except JWTError:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="無効なトークンです",
+			headers={"WWW-Authenticate": "Bearer"},
+		)
+	
+	result = await db.execute(select(User).filter(User.username == username))
+	user = result.scalar_one_or_none()
+	if user is None:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="ユーザーが見つかりません",
+			headers={"WWW-Authenticate": "Bearer"},
+		)
+	return user
+
 @api_v0_router.post("/auth/login")
 async def login(user_data: LoginSchema, db: AsyncSession = Depends(get_db), response: Response = None):
     result = await db.execute(select(User).filter(User.username == user_data.username))
@@ -211,4 +329,109 @@ async def login(user_data: LoginSchema, db: AsyncSession = Depends(get_db), resp
 	)
     
     return {"message": "Logged in successfully"}
+
+@api_v0_router.post("/polls")
+async def create_poll(poll_data: PostCreateSchema, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+	# 新しい投票テーマを作成
+	new_post = Post(
+		id=uuid6.uuid7().bytes,
+		title=poll_data.title,
+		description=poll_data.description,
+		created_at=datetime.utcnow(),
+		category=poll_data.category,
+		author=current_user.id
+	)
+	db.add(new_post)
+	await db.flush()  # IDを取得するために
+	
+	# 選択肢を作成
+	for i, choice_text in enumerate(poll_data.choices):
+		choice = Choice(
+			post_id=new_post.id,
+			choice=choice_text,
+			number=i + 1
+		)
+		db.add(choice)
+	
+	await db.commit()
+	await db.refresh(new_post)
+	
+	return {
+		"theme_id": uuid6.UUID(bytes=new_post.id).hex,
+		"theme_name": new_post.title,
+		"created_at": new_post.created_at.isoformat()
+	}
+
+@api_v0_router.put("/users/{user_id}")
+async def update_user(user_id: str, user_data: UserUpdateSchema, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+	try:
+		user_uuid = uuid6.UUID(user_id).bytes
+	except ValueError:
+		raise HTTPException(status_code=400, detail="Invalid user_id format")
+	
+	# 自分自身の情報のみ更新可能
+	if current_user.id != user_uuid:
+		raise HTTPException(status_code=403, detail="Can only update your own information")
+	
+	# ユーザー名の重複チェック
+	if user_data.username:
+		result = await db.execute(select(User).filter(User.username == user_data.username, User.id != user_uuid))
+		existing_user = result.scalar_one_or_none()
+		if existing_user:
+			raise HTTPException(status_code=409, detail="Username already exists")
+		current_user.username = user_data.username
+	
+	if user_data.displayname:
+		current_user.displayname = user_data.displayname
+	
+	if user_data.password:
+		current_user.password = pwd_context.hash(user_data.password)
+	
+	await db.commit()
+	await db.refresh(current_user)
+	
+	return {
+		"id": uuid6.UUID(bytes=current_user.id).hex,
+		"username": current_user.username,
+		"displayname": current_user.displayname
+	}
+
+@api_v0_router.post("/polls/{theme_id}/vote")
+async def vote_poll(theme_id: str, vote_data: VoteSchema, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+	try:
+		theme_uuid = uuid6.UUID(theme_id).bytes
+	except ValueError:
+		raise HTTPException(status_code=400, detail="Invalid theme_id format")
+	
+	# 投票テーマが存在するかチェック
+	result = await db.execute(select(Post).filter(Post.id == theme_uuid))
+	post = result.scalar_one_or_none()
+	if not post:
+		raise HTTPException(status_code=404, detail="Poll not found")
+	
+	# 選択肢が存在するかチェック
+	result = await db.execute(select(Choice).filter(Choice.post_id == theme_uuid, Choice.number == vote_data.choice_number))
+	choice = result.scalar_one_or_none()
+	if not choice:
+		raise HTTPException(status_code=400, detail="Invalid choice number")
+	
+	# 既存の投票をチェック
+	result = await db.execute(select(Vote).filter(Vote.post_id == theme_uuid, Vote.user_id == current_user.id))
+	existing_vote = result.scalar_one_or_none()
+	
+	if existing_vote:
+		# 既存の投票を更新
+		existing_vote.number = vote_data.choice_number
+	else:
+		# 新しい投票を作成
+		new_vote = Vote(
+			post_id=theme_uuid,
+			user_id=current_user.id,
+			number=vote_data.choice_number
+		)
+		db.add(new_vote)
+	
+	await db.commit()
+	
+	return {"message": "Vote recorded successfully"}
 
