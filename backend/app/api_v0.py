@@ -9,7 +9,7 @@ from sqlalchemy.dialects.mysql import BINARY
 from sqlalchemy.future import select
 from pydantic import BaseModel
 from passlib.context import CryptContext
-from jose import JWTError, jwt
+from jose import JWTError, jwt, JWTError
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -72,9 +72,22 @@ async def get_db() -> AsyncSession:
     async with AsyncSessionLocal() as session:
         yield session
 
+# JWTトークンの検証関数
+async def verify_token(access_token: str = Cookie(None)):
+	if access_token is None:
+		raise HTTPException(status_code=401, detail="Authorization token missing")
+	try:
+		payload = jwt.decode(access_token, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")])
+		username: str = payload.get("sub")
+		if username is None:
+			raise HTTPException(status_code=401, detail="Invalid token")
+	except JWTError:
+		raise HTTPException(status_code=401, detail="Invalid token")
+	return username
+
 
 @api_v0_router.get("/polls/search")
-async def search_polls(query: str = Query(..., description="検索文字列")):
+async def search_polls(query: str = Query(..., description="検索文字列"), current_user: str = Depends(verify_token)):
 	async with AsyncSessionLocal() as session:
 		pattern = f"%{query}%"
 		stmt = select(Post).where(Post.title.like(pattern))
@@ -124,7 +137,9 @@ class UserSchema(BaseModel):
 
 
 @api_v0_router.get("/users/{user_id}", response_model=UserSchema)
-async def get_user(user_id: str, db: AsyncSession = Depends(get_db)):
+async def get_user(user_id: str, 
+                   db: AsyncSession = Depends(get_db),
+                   current_user: str = Depends(verify_token)):
 	try:
 		user_uuid = uuid6.UUID(user_id).bytes  # 文字列から BINARY(16) に変換
 	except ValueError:
@@ -309,7 +324,7 @@ async def login(user_data: LoginSchema, db: AsyncSession = Depends(get_db), resp
         value=token,
         httponly=True,
         samesite="lax",
-        secure=True,
+        secure=False, # 本番環境ではTrueにする
         max_age=int(access_token_expires.total_seconds())
 	)
     

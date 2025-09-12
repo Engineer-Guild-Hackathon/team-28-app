@@ -6,14 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/common/header";
-import { categories } from "@/constants/categories";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { categoryMap } from "@/constants/categories";
+import { PlusCircle, Trash2, Loader2 } from "lucide-react";
+import { createPoll, type CreatePollData } from "@/lib/api";
 
 export default function NewPollPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("一般");
+  const [category, setCategory] = useState<number>(2); // 一般のID
   const [options, setOptions] = useState(["", ""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -81,36 +82,33 @@ export default function NewPollPage() {
     try {
       // APIリクエストの準備
       const filteredOptions = options.filter((opt) => opt.trim() !== "");
-      const pollData = {
+      const pollData: CreatePollData = {
         title,
-        description,
+        description: description || undefined, // 空文字列の場合はundefined
         category,
-        options: filteredOptions,
+        choices: filteredOptions,
       };
 
-      // TODO: APIとの連携
-      // const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      // const response = await fetch(`${apiBaseUrl}/polls`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(pollData),
-      // });
+      // APIを使って投票を作成
+      try {
+        const result = await createPoll(pollData);
+        console.log("投票を作成しました:", result);
 
-      // if (!response.ok) {
-      //   throw new Error("投票の作成に失敗しました");
-      // }
-
-      // const data = await response.json();
-
-      // 成功したら投票ページに遷移
-      console.log("投票を作成しました:", pollData);
-      alert("投票を作成しました！");
-      router.push("/"); // 成功したらホームページに遷移
+        // 成功したら投票ページに遷移
+        router.push(`/poll/${result.theme_id}`);
+      } catch (apiError) {
+        console.error("API呼び出しエラー:", apiError);
+        throw new Error(
+          "投票の作成に失敗しました。後でもう一度お試しください。"
+        );
+      }
     } catch (err) {
       console.error("エラー:", err);
-      setError("投票の作成に失敗しました。再度お試しください。");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "投票の作成に失敗しました。再度お試しください。"
+      );
     } finally {
       setLoading(false);
     }
@@ -189,14 +187,14 @@ export default function NewPollPage() {
               <select
                 id="category"
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => setCategory(Number(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
-                {categories
-                  .filter((cat) => cat !== "すべて")
-                  .map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
+                {Object.entries(categoryMap)
+                  .filter(([id]) => id !== "1") // "すべて"を除外
+                  .map(([id, name]) => (
+                    <option key={id} value={id}>
+                      {name}
                     </option>
                   ))}
               </select>
@@ -262,7 +260,14 @@ export default function NewPollPage() {
                 disabled={loading}
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                {loading ? "作成中..." : "投票を作成する"}
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    作成中...
+                  </>
+                ) : (
+                  "投票を作成する"
+                )}
               </Button>
             </div>
           </form>
