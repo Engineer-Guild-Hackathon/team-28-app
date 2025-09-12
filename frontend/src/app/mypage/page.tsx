@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Header from "@/components/common/header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,17 +22,16 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
+import { useEffect, useState } from "react";
 
-// ダミーデータ
-const USER_DATA = {
-  id: "user123",
-  name: "山田 太郎",
-  username: "yamada_taro",
-  email: "yamada@example.com",
-  bio: "UI/UXデザイナー。新しいテクノロジーに興味があります。趣味は写真撮影とカフェ巡りです。",
-  joinedDate: new Date("2023-04-15"),
-  followersCount: 128,
-  followingCount: 95,
+interface User {
+  username: string;
+  displayname: string;
+}
+
+const USER_DATA: User = {
+  username: "山田太郎",
+  displayname: "yamada_taro",
 };
 
 // 作成した投票のダミーデータ
@@ -118,6 +118,14 @@ const FAVORITE_POLLS = [
 
 export default function MyPage() {
   // 必要に応じてタブの状態を管理できるようにstateを残しておく
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    fetch("/users", { credentials: "include" })
+      .then((res) => res.json())
+      .then(setUser)
+      .catch(() => setUser(null));
+  }, []);
 
   return (
     <>
@@ -130,16 +138,18 @@ export default function MyPage() {
               <CardHeader className="flex flex-col items-center pb-2">
                 <div className="h-24 w-24 bg-blue-600 rounded-full flex items-center justify-center mb-3">
                   <span className="text-white text-3xl font-bold">
-                    {USER_DATA.name.substring(0, 2)}
+                    {USER_DATA.username.substring(0, 2)}
                   </span>
                 </div>
-                <CardTitle className="mt-4 text-xl">{USER_DATA.name}</CardTitle>
-                <p className="text-gray-500">@{USER_DATA.username}</p>
+                <CardTitle className="mt-4 text-xl">
+                  {USER_DATA.username}
+                </CardTitle>
+                <p className="text-gray-500">@{USER_DATA.displayname}</p>
               </CardHeader>
               <CardFooter>
                 <Button variant="outline" className="w-full flex items-center">
                   <Settings className="h-4 w-4 mr-2" />
-                  プロフィール編集
+                  <Link href="/mypage/edit">プロフィール編集</Link>
                 </Button>
               </CardFooter>
             </Card>
@@ -230,44 +240,6 @@ export default function MyPage() {
                           <p>
                             投票日:{" "}
                             {format(poll.votedAt, "yyyy年MM月dd日", {
-                              locale: ja,
-                            })}
-                          </p>
-                          <p className="mt-1">作成者: {poll.author}</p>
-                        </div>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-
-              {/* お気に入り */}
-              <TabsContent value="favorites">
-                <h2 className="text-2xl font-bold mb-4">お気に入り</h2>
-                <div className="space-y-4">
-                  {FAVORITE_POLLS.map((poll) => (
-                    <Card
-                      key={poll.id}
-                      className="hover:shadow-md transition-shadow"
-                    >
-                      <CardHeader>
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="text-lg">
-                              {poll.title}
-                            </CardTitle>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {poll.description}
-                            </p>
-                          </div>
-                          <Badge variant="outline">{poll.category}</Badge>
-                        </div>
-                      </CardHeader>
-                      <CardFooter className="flex justify-between pt-0">
-                        <div className="text-xs text-gray-500">
-                          <p>
-                            作成日:{" "}
-                            {format(poll.createdAt, "yyyy年MM月dd日", {
                               locale: ja,
                             })}
                           </p>

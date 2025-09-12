@@ -177,7 +177,7 @@ export default function EditProfilePage() {
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>ユーザー名</FormLabel>
+                        <FormLabel>表示名</FormLabel>
                         <FormControl>
                           <Input placeholder="ユーザー名を入力" {...field} />
                         </FormControl>
