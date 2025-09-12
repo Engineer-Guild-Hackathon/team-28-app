@@ -39,7 +39,7 @@ class Post(Base):
 	title = Column(String(128), nullable=False)
 	description = Column(String(1024), nullable=True)
 	created_at = Column(DateTime, nullable=False)
-	category = Column(String(32), nullable=False)
+	category = Column(Integer, nullable=False)
 	author = Column(BINARY(16), ForeignKey("users.id"), nullable=False)
 	author_obj = relationship("User", back_populates="posts")
 	choices = relationship("Choice", back_populates="post_obj")
