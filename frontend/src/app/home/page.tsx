@@ -94,7 +94,7 @@ export default function HomePage() {
         {/* 人気の投票一覧 */}
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-gray-900">
-            {selectedCategory}の投票
+            {getCategoryText(selectedCategory)}の投票
           </h3>
           {isLoading && (
             <div className="flex items-center">
