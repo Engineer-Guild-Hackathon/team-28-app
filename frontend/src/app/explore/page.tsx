@@ -1,75 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Header from "@/components/common/header";
-
-// ダミーデータ：投票項目
-const dummyPolls = [
-  {
-    id: 1,
-    title: "好きな季節は？",
-    votes: 1289,
-    options: ["春", "夏", "秋", "冬"],
-    creator: {
-      name: "山田太郎",
-    },
-    category: "一般",
-  },
-  {
-    id: 2,
-    title: "最も好きな食べ物は？",
-    votes: 876,
-    options: ["ラーメン", "寿司", "カレー", "ピザ", "パスタ"],
-    creator: {
-      name: "佐藤花子",
-    },
-    category: "食べ物",
-  },
-  {
-    id: 3,
-    title: "理想の休日の過ごし方は？",
-    votes: 642,
-    options: [
-      "自宅でリラックス",
-      "アウトドア活動",
-      "友達と外出",
-      "趣味に没頭",
-      "旅行",
-    ],
-    creator: {
-      name: "鈴木一郎",
-    },
-    category: "ライフスタイル",
-  },
-  {
-    id: 4,
-    title: "最も使用頻度の高いSNSは？",
-    votes: 512,
-    options: ["Twitter", "Instagram", "Facebook", "TikTok", "LinkedIn"],
-    creator: {
-      name: "田中美咲",
-    },
-    category: "テクノロジー",
-  },
-  {
-    id: 5,
-    title: "2024年のベスト映画は？",
-    votes: 489,
-    options: [
-      "デューン 砂の惑星PART2",
-      "インサイド・ヘッド2",
-      "マッドマックス:フュリオサ",
-      "ゴジラxコング:新たなる帝国",
-    ],
-    creator: {
-      name: "高橋健太",
-    },
-    category: "エンタメ",
-  },
-];
+import { searchPolls, type Poll, getCategoryText } from "@/lib/api";
+import { Loader2 } from "lucide-react";
 
 // カテゴリーのリスト
 import { categories } from "@/constants/categories";
@@ -78,32 +15,54 @@ export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("すべて");
   const [sortOption, setSortOption] = useState("人気順");
+  const [polls, setPolls] = useState<Poll[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 検索処理の実行
+  const handleSearch = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // 検索語で検索
+      const response = await searchPolls(searchTerm);
+      setPolls(response.themes);
+    } catch (err) {
+      console.error("検索エラー:", err);
+      setError("検索中にエラーが発生しました。後でもう一度お試しください。");
+      setPolls([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 初回ロード時に空検索を実行
+  useEffect(() => {
+    handleSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 検索結果のフィルタリング
-  const filteredPolls = dummyPolls
+  const filteredPolls = polls
     .filter((poll) => {
       // カテゴリーフィルター
-      if (selectedCategory !== "すべて" && poll.category !== selectedCategory) {
+      const categoryText = getCategoryText(poll.category);
+      if (selectedCategory !== "すべて" && categoryText !== selectedCategory) {
         return false;
       }
-
-      // 検索語フィルター
-      if (
-        searchTerm &&
-        !poll.title.toLowerCase().includes(searchTerm.toLowerCase())
-      ) {
-        return false;
-      }
-
       return true;
     })
     .sort((a, b) => {
       // 並び替え
       if (sortOption === "人気順") {
-        return b.votes - a.votes;
+        // APIから取得したデータにはvotesがないので、theme_idで並べる
+        return a.theme_id.localeCompare(b.theme_id);
       } else if (sortOption === "新着順") {
-        // ここでは投票数をダミーの新着順として使用
-        return b.id - a.id;
+        // 作成日でソート
+        return (
+          new Date(b.create_at).getTime() - new Date(a.create_at).getTime()
+        );
       }
       return 0;
     });
@@ -172,10 +131,22 @@ export default function SearchPage() {
                 <option value="新着順">新着順</option>
               </select>
             </div>
-            <Button className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
-              検索
+            <Button
+              onClick={handleSearch}
+              className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  検索中...
+                </>
+              ) : (
+                "検索"
+              )}
             </Button>
           </div>
+          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         </div>
 
         {/* 検索結果カウント */}
@@ -190,51 +161,30 @@ export default function SearchPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPolls.map((poll) => (
               <div
-                key={poll.id}
+                key={poll.theme_id}
                 className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
               >
                 <div className="p-6">
-                  <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
-                    {poll.title}
-                  </h4>
-                  <div className="flex items-center text-sm text-gray-600 mb-4">
-                    <span className="mr-4">
-                      <span className="font-medium text-blue-600">
-                        {poll.votes}
-                      </span>{" "}
-                      票
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-gray-500">
+                      ID: {poll.theme_id}
                     </span>
-                    <span className="flex items-center">
-                      <span className="bg-gray-200 px-2 py-1 rounded-full text-xs">
-                        {poll.category}
-                      </span>
+                    <span className="bg-gray-200 px-2 py-1 rounded-full text-xs">
+                      {getCategoryText(poll.category)}
                     </span>
                   </div>
-                  <div className="space-y-2 mb-6">
-                    {poll.options.slice(0, 3).map((option, index) => (
-                      <div key={index} className="flex items-center">
-                        <div
-                          className={`w-1 h-4 rounded-full mr-2 ${
-                            ["bg-blue-500", "bg-green-500", "bg-purple-500"][
-                              index % 3
-                            ]
-                          }`}
-                        />
-                        <span className="text-sm text-gray-700 line-clamp-1">
-                          {option}
-                        </span>
-                      </div>
-                    ))}
-                    {poll.options.length > 3 && (
-                      <div className="text-xs text-gray-500 ml-3">
-                        + {poll.options.length - 3} 選択肢
-                      </div>
-                    )}
+                  <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
+                    {poll.theme_name}
+                  </h4>
+                  <div className="flex items-center text-sm text-gray-600 mb-4">
+                    <span className="text-xs text-gray-500">
+                      作成日: {new Date(poll.create_at).toLocaleDateString()}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <span className="ml-2 text-xs text-gray-500">
-                        {poll.creator.name}
+                        作成者ID: {poll.author.substring(0, 8)}...
                       </span>
                     </div>
                     <Button
@@ -243,7 +193,7 @@ export default function SearchPage() {
                       variant="outline"
                       className="text-xs"
                     >
-                      <Link href={`/polls/${poll.id}`}>投票する</Link>
+                      <Link href={`/poll/${poll.theme_id}`}>投票する</Link>
                     </Button>
                   </div>
                 </div>

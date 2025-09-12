@@ -1,86 +1,52 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/common/header";
-
-// ダミーデータ：投票項目
-const popularPolls = [
-  {
-    id: 1,
-    title: "好きな季節は？",
-    votes: 1289,
-    options: ["春", "夏", "秋", "冬"],
-    creator: {
-      name: "山田太郎",
-    },
-    category: "一般",
-  },
-  {
-    id: 2,
-    title: "最も好きな食べ物は？",
-    votes: 876,
-    options: ["ラーメン", "寿司", "カレー", "ピザ", "パスタ"],
-    creator: {
-      name: "佐藤花子",
-    },
-    category: "食べ物",
-  },
-  {
-    id: 3,
-    title: "理想の休日の過ごし方は？",
-    votes: 642,
-    options: [
-      "自宅でリラックス",
-      "アウトドア活動",
-      "友達と外出",
-      "趣味に没頭",
-      "旅行",
-    ],
-    creator: {
-      name: "鈴木一郎",
-    },
-    category: "ライフスタイル",
-  },
-  {
-    id: 4,
-    title: "最も使用頻度の高いSNSは？",
-    votes: 512,
-    options: ["Twitter", "Instagram", "Facebook", "TikTok", "LinkedIn"],
-    creator: {
-      name: "田中美咲",
-    },
-    category: "テクノロジー",
-  },
-  {
-    id: 5,
-    title: "2024年のベスト映画は？",
-    votes: 489,
-    options: [
-      "デューン 砂の惑星PART2",
-      "インサイド・ヘッド2",
-      "マッドマックス:フュリオサ",
-      "ゴジラxコング:新たなる帝国",
-    ],
-    creator: {
-      name: "高橋健太",
-    },
-    category: "エンタメ",
-  },
-];
+import { getPollsByCategory, type Poll, getCategoryText } from "@/lib/api";
+import { Loader2 } from "lucide-react";
 
 // カテゴリーのリスト
-import { categories } from "@/constants/categories";
+import { categoryMap } from "@/constants/categories";
 
 export default function HomePage() {
-  const [selectedCategory, setSelectedCategory] = useState("すべて");
+  const [selectedCategory, setSelectedCategory] = useState<number>(1); // デフォルトは「すべて」(ID:1)
+  const [polls, setPolls] = useState<Poll[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // カテゴリーが変更されたときに投票を取得
+  useEffect(() => {
+    // カテゴリーに基づいて投票を取得する関数
+    const fetchPollsByCategory = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // カテゴリーIDを文字列に変換して渡す（API側の対応が完了するまでの暫定対応）
+        const categoryText =
+          selectedCategory === 1
+            ? ""
+            : categoryMap[selectedCategory as keyof typeof categoryMap];
+        const response = await getPollsByCategory(categoryText);
+        setPolls(response.themes);
+      } catch (err) {
+        console.error("カテゴリー検索エラー:", err);
+        setError(
+          "投票の取得中にエラーが発生しました。後でもう一度お試しください。"
+        );
+        setPolls([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPollsByCategory();
+  }, [selectedCategory]);
 
   // カテゴリーでフィルタリングした投票を取得
-  const filteredPolls =
-    selectedCategory === "すべて"
-      ? popularPolls
-      : popularPolls.filter((poll) => poll.category === selectedCategory);
+  const filteredPolls = polls;
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -109,92 +75,96 @@ export default function HomePage() {
         {/* カテゴリータブ */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
           <div className="flex space-x-2 overflow-x-auto pb-2">
-            {categories.map((category) => (
+            {Object.entries(categoryMap).map(([id, name]) => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
+                key={id}
+                onClick={() => setSelectedCategory(Number(id))}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                  selectedCategory === category
+                  selectedCategory === Number(id)
                     ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                 }`}
               >
-                {category}
+                {name}
               </button>
             ))}
           </div>
         </div>
 
         {/* 人気の投票一覧 */}
-        <h3 className="text-xl font-bold text-gray-900 mb-6">人気の投票</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPolls.map((poll) => (
-            <div
-              key={poll.id}
-              className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-            >
-              <div className="p-6">
-                <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
-                  {poll.title}
-                </h4>
-                <div className="flex items-center text-sm text-gray-600 mb-4">
-                  <span className="mr-4">
-                    <span className="font-medium text-blue-600">
-                      {poll.votes}
-                    </span>{" "}
-                    票
-                  </span>
-                  <span className="flex items-center">
-                    <span className="bg-gray-200 px-2 py-1 rounded-full text-xs">
-                      {poll.category}
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-gray-900">
+            {selectedCategory}の投票
+          </h3>
+          {isLoading && (
+            <div className="flex items-center">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <span className="text-sm text-gray-500">読み込み中...</span>
+            </div>
+          )}
+        </div>
+
+        {error && (
+          <div className="bg-red-50 text-red-800 p-4 rounded-lg mb-6">
+            <p>{error}</p>
+          </div>
+        )}
+
+        {!isLoading && filteredPolls.length === 0 && (
+          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <p className="text-gray-500 text-lg">
+              この条件の投票はまだありません。
+            </p>
+            <Button asChild className="mt-6 bg-blue-600 hover:bg-blue-700">
+              <Link href="/poll/new">投票を作成する</Link>
+            </Button>
+          </div>
+        )}
+
+        {filteredPolls.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPolls.map((poll) => (
+              <div
+                key={poll.theme_id}
+                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+              >
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-gray-500">
+                      ID: {poll.theme_id}
                     </span>
-                  </span>
-                </div>
-                <div className="space-y-2 mb-6">
-                  {poll.options.slice(0, 3).map((option, index) => (
-                    <div key={index} className="flex items-center">
-                      <div
-                        className={`w-1 h-4 rounded-full mr-2 ${
-                          ["bg-blue-500", "bg-green-500", "bg-purple-500"][
-                            index % 3
-                          ]
-                        }`}
-                      />
-                      <span className="text-sm text-gray-700 line-clamp-1">
-                        {option}
-                      </span>
-                    </div>
-                  ))}
-                  {poll.options.length > 3 && (
-                    <div className="text-xs text-gray-500 ml-3">
-                      + {poll.options.length - 3} 選択肢
-                    </div>
-                  )}
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div className="h-6 w-6 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">
-                        {poll.creator.name.charAt(0)}
-                      </span>
-                    </div>
-                    <span className="ml-2 text-xs text-gray-500">
-                      {poll.creator.name}
+                    <span className="bg-gray-200 px-2 py-1 rounded-full text-xs">
+                      {getCategoryText(poll.category)}
                     </span>
                   </div>
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="outline"
-                    className="text-xs"
-                  >
-                    <Link href={`/polls/${poll.id}`}>投票する</Link>
-                  </Button>
+                  <h4 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
+                    {poll.theme_name}
+                  </h4>
+                  <div className="flex items-center text-sm text-gray-600 mb-4">
+                    <span className="text-xs text-gray-500">
+                      作成日: {new Date(poll.create_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <span className="ml-2 text-xs text-gray-500">
+                        作成者ID: {poll.author.substring(0, 8)}...
+                      </span>
+                    </div>
+                    <Button
+                      asChild
+                      size="sm"
+                      variant="outline"
+                      className="text-xs"
+                    >
+                      <Link href={`/poll/${poll.theme_id}`}>投票する</Link>
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* もっと見るボタン */}
         <div className="mt-12 text-center">
