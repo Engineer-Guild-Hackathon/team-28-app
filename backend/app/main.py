@@ -17,7 +17,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"、 "https://team-28-app-frontend-629273086549.europe-west1.run.app"],
+    allow_origins=["http://localhost:3000", "https://team-28-app-frontend-629273086549.europe-west1.run.app"],
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
