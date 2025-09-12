@@ -6,3 +6,5 @@ aiofiles>=23.2.0  # 静的ファイル配信に必要
 sqlalchemy>=2.0.0
 asyncmy>=0.2.7
 uuid6
+passlib[argon2]>=1.7.4
+cryptography>=41.0.0

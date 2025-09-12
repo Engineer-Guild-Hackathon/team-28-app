@@ -9,6 +9,7 @@ from sqlalchemy import Column, String, DateTime, Integer, ForeignKey, select
 from sqlalchemy.dialects.mysql import BINARY
 from sqlalchemy.future import select
 from pydantic import BaseModel
+from passlib.context import CryptContext
 
 # SQLAlchemy MySQL (asyncmy) 接続設定
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -25,8 +26,8 @@ Base = declarative_base()
 class User(Base):
 	__tablename__ = "users"
 	id = Column(BINARY(16), primary_key=True, nullable=False, default=lambda: uuid6.uuid7().bytes)
-	username = Column(String(32), unique=True, nullable=False)
-	displayname = Column(String(64), nullable=False)
+	username = Column("user_name",String(32), unique=True, nullable=False)
+	displayname = Column("display_name",String(64), nullable=False)
 	password = Column(String(128), nullable=False)  # argon2id hash
 	posts = relationship("Post", back_populates="author_obj")
 	votes = relationship("Vote", back_populates="user_obj")
@@ -116,4 +117,36 @@ async def get_user(user_id: str, db: AsyncSession = Depends(get_db)):
 		id=uuid6.UUID(bytes=user.id).hex,
 		username=user.username,
 		displayname=user.displayname
+	)
+
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+class UserCreateSchema(BaseModel):
+	username: str
+	displayname: str
+	password: str
+
+@api_v0_router.post("/auth/signup", response_model=UserSchema)
+async def create_user(user_data: UserCreateSchema, db: AsyncSession = Depends(get_db)):
+	# ユーザーの作成処理を実装
+	result = await db.execute(select(User).filter(User.username == user_data.username))
+	existing_user = result.scalar_one_or_none()
+	if existing_user:
+		raise HTTPException(status_code=409, detail="Username already exists")
+	# パスワードをハッシュ化
+	hashed_password = pwd_context.hash(user_data.password)
+
+	# DBモデルのインスタンスを作成
+	new_user = User(
+		id=uuid6.uuid7().bytes,
+		username=user_data.username,
+		displayname=user_data.displayname,
+		password=hashed_password
+	)
+	db.add(new_user)
+	await db.commit()
+	await db.refresh(new_user)
+	return UserSchema(
+		id=uuid6.UUID(bytes=new_user.id).hex,
+		username=new_user.username,
+		displayname=new_user.displayname
 	)
